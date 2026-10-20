@@ -1,0 +1,26 @@
+// Prime Sieve — GenesisLang
+fn is_prime(n) {
+    if n < 2 {
+        return false
+    }
+    let i = 2
+    while i * i <= n {
+        if n % i == 0 {
+            return false
+        }
+        i = i + 1
+    }
+    return true
+}
+
+fn main() {
+    let count = 0
+    let n = 2
+    while count < 20 {
+        if is_prime(n) {
+            emit n
+            count = count + 1
+        }
+        n = n + 1
+    }
+}

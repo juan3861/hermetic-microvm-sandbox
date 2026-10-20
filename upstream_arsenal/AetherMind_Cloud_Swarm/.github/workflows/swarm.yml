@@ -1,0 +1,38 @@
+name: AetherMind Cloud Swarm (20 Nodes)
+on:
+  workflow_dispatch:
+    inputs:
+      c2_url:
+        description: 'URL do Tunel C2 do Mestre (ex: https://xxx.ngrok.io)'
+        required: true
+        default: 'https://c2.aethermind.local'
+        
+  schedule:
+    - cron: '0 */12 * * *' # A cada 12 horas ele raspa leads
+    
+jobs:
+  mythos_worker:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+        
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install requests beautifulsoup4
+        
+    - name: Wake Up Mythos Node
+      run: |
+        echo "AetherMind Node ${{ matrix.node }} online."
+        # Usa o URL do evento manual, ou uma URL fixa no Secret se for automatizado
+        C2_TARGET="${{ github.event.inputs.c2_url || secrets.AETHERMIND_C2_URL }}"
+        python aethermind_cloud_worker.py --node ${{ matrix.node }} --c2 $C2_TARGET

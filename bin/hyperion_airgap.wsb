@@ -1,0 +1,15 @@
+<Configuration>
+  <VGpu>Disable</VGpu>
+  <Networking>Disable</Networking>
+  <MemoryInMB>4096</MemoryInMB>
+  <MappedFolders>
+    <MappedFolder>
+      <HostFolder>F:\UCIP</HostFolder>
+      <SandboxFolder>C:\Users\WDAGUtilityAccount\Desktop\hyperion_workspace</SandboxFolder>
+      <ReadOnly>true</ReadOnly>
+    </MappedFolder>
+  </MappedFolders>
+  <LogonCommand>
+    <Command>cmd.exe /c echo TITAN-HYPERION WINDOWS SANDBOX ACTIVE &gt; C:\Users\WDAGUtilityAccount\Desktop\sandbox_ready.txt</Command>
+  </LogonCommand>
+</Configuration>

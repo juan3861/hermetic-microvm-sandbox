@@ -1,0 +1,34 @@
+name: AetherMind Cognitive Hunter Swarm
+on:
+  workflow_dispatch:
+    inputs:
+      c2_url:
+        description: 'URL do Tunel C2 do Mestre (ex: https://xxx.ngrok.io)'
+        required: true
+        default: 'https://c2.aethermind.local'
+        
+jobs:
+  hunt_cognition:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [1, 2, 3, 4, 5, 6, 7] # 7 nós simultâneos (7 buscas deferentes simultâneas)
+        
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install requests
+        
+    - name: Wake Up Cognitive Hunter Node
+      run: |
+        echo "AetherMind Hunter Node ${{ matrix.node }} online."
+        C2_TARGET="${{ github.event.inputs.c2_url || secrets.AETHERMIND_C2_URL }}"
+        python aethermind_cognitive_hunter.py --node ${{ matrix.node }} --c2 $C2_TARGET

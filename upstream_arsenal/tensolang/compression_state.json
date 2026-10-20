@@ -1,0 +1,29 @@
+{
+  "generation": 25,
+  "timestamp": "2026-05-19T06:47:34.066265",
+  "compressions": [
+    {
+      "name": "psi_modules",
+      "original_params": 15,
+      "compressed_rank": 1,
+      "ratio": 1.667,
+      "energy": 0.6,
+      "singular_values": [
+        2.248
+      ],
+      "compressed": true
+    },
+    {
+      "name": "task_cortex_state",
+      "original_params": 8,
+      "compressed_rank": 1,
+      "ratio": 1.143,
+      "energy": 0.6,
+      "singular_values": [
+        27.8927
+      ],
+      "compressed": true
+    }
+  ],
+  "total_ratio": 1.905
+}

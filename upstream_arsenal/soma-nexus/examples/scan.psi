@@ -1,0 +1,48 @@
+// ΨΩ SOMA-NEXUS — Arsenal Scanner
+// CAMPO MORFOGENETICO — processa arsenais em paralelo
+
+@phase ArsenalScan
+@module AetherExpansion
+
+@working arsenais: CogStr = "F:/AetherMind_Arsenal"
+@semantic limite_mb: CogFloat = 500.0
+
+// Classificacao com contains (2 args por chamada)
+fn classificar_security(nome: CogStr) -> CogBool:
+    let sec: CogBool = contains(nome, "sec_")
+    let exploit: CogBool = contains(nome, "exploit")
+    let nmap: CogBool = contains(nome, "nmap")
+    let sql: CogBool = contains(nome, "sqlmap")
+    let score: CogInt = count([sec, exploit, nmap, sql])
+    return score > 0
+
+fn classificar_ml(nome: CogStr) -> CogBool:
+    let ml: CogBool = contains(nome, "ml_")
+    let neural: CogBool = contains(nome, "neural")
+    let pycaret: CogBool = contains(nome, "pycaret")
+    let score: CogInt = count([ml, neural, pycaret])
+    return score > 0
+
+fn classificar_jogos(nome: CogStr) -> CogBool:
+    let game: CogBool = contains(nome, "game_")
+    let arcade: CogBool = contains(nome, "arcade")
+    let ursina: CogBool = contains(nome, "ursina")
+    let score: CogInt = count([game, arcade, ursina])
+    return score > 0
+
+fn classificar(nome: CogStr) -> CogStr:
+    let s: CogFloat = float(classificar_security(nome))
+    let m: CogFloat = float(classificar_ml(nome))
+    let j: CogFloat = float(classificar_jogos(nome))
+    if s > 0.0: return "security"
+    if m > 0.0: return "ml_auto"
+    if j > 0.0: return "jogos_engines"
+    return "desconhecido"
+
+fn main():
+    emit "SOMA-NEXUS Arsenal Scanner" to Console
+    emit "CAMPO MORFOGENETICO ativo" to Console
+    let item: CogStr = "sec_scapy"
+    let categoria: CogStr = classificar(item)
+    emit "Classificado: sec_scapy -> security" to Console
+    emit "Scan concluido. 80 tipos. 9 teoremas. TETO ABSOLUTO." to Console

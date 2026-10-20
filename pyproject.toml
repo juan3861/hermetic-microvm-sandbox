@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hyperion-agent-sandbox"
+version = "2.0.0"
+authors = [
+  { name="Ruan Novaes", email="ruan@aethermind.ai" },
+]
+description = "The Ultimate AGI Agent Sandbox & Dual-Engine Hermetic Code Execution Runtime — 5-Tier Cloud-Cascade (StackBlitz Wasm, CodeSandbox MicroVMs) + Kernel RAM-Disk (bwrap in 2ms) with Zero Host Disk Wear & Adversarial Armor."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: Microsoft :: Windows",
+    "Topic :: Security",
+    "Topic :: Software Development :: Compilers",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "z3-solver>=4.12.0",
+    "networkx>=3.0",
+    "numpy>=1.24.0",
+    "libcst>=1.0.0",
+    "bandit>=1.7.5",
+    "radon>=6.0.1",
+    "vulture>=2.7"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/juan3861/hyperion-agent-sandbox"
+"Bug Tracker" = "https://github.com/juan3861/hyperion-agent-sandbox/issues"
+
+[project.scripts]
+hyperion = "orchestrator:main"

@@ -1,0 +1,15 @@
+// TensoLang — Rede Tensorial (MPS)
+// Simula uma cadeia de operações como rede tensorial
+
+network processador {
+    site entrada = [1, 0.8, 0.6]
+    site camada1 = [0.8, 1, 0.4]
+    site camada2 = [0.6, 0.4, 1]
+    site camada3 = [0.3, 0.7, 0.5]
+    site saida = [0.9, 0.2, 0.8]
+
+    compress(energy=0.90)
+    contract()
+}
+
+emit "Rede processador comprimida e contraída"

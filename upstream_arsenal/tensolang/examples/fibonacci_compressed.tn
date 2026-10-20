@@ -1,0 +1,21 @@
+// TensoLang — Fibonacci com Métricas de Compressão
+// Cada iteração gera tensores, comprimidos automaticamente
+
+fn fib(n) {
+    if n <= 1 {
+        return n
+    }
+    return fib(n - 1) + fib(n - 2)
+}
+
+fn main() {
+    emit "=== Fibonacci (15 termos) ==="
+    for i in 0..15 {
+        emit fib(i)
+    }
+
+    emit ""
+    emit "=== Métricas da Rede ==="
+    let ratio = compress_ratio()
+    emit "Compressão média: " + ratio + "x"
+}

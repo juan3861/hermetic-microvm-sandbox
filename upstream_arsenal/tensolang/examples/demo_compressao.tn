@@ -1,0 +1,31 @@
+// TensoLang — Demonstração de Compressão Alienígena
+// Tudo é tensor. Código = Rede Tensorial.
+
+// Tensor 1D — vetor
+tensor v = [1, 2, 3, 4, 5]
+
+// Tensor 2D — matriz
+tensor M = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+
+// Compressão via SVD com 95% de energia
+emit "=== Compressão SVD ==="
+let result = compress(M, energy=0.95)
+emit "Compressão concluída com sucesso"
+
+// Tensor 3D
+tensor T = [
+    [[1, 2], [3, 4]],
+    [[5, 6], [7, 8]]
+]
+
+// Decomposição SVD
+emit "=== Decomposição SVD ==="
+let decomp = svd(M)
+
+// Contração tensorial
+tensor a = [1, 2, 3]
+tensor b = [4, 5, 6]
+emit "=== Contração @ ==="
+let c = a @ b
+
+emit "Fim da demonstração"

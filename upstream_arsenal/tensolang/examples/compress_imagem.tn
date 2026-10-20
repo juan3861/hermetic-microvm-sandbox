@@ -1,0 +1,19 @@
+// TensoLang — Compressão de Imagem
+// Simula compressão de matriz 4x4 via SVD
+
+fn compress_image(pixels, energy) -> compress(pixels, energy=energy)
+
+tensor imagem = [
+    [100, 120, 80, 90],
+    [110, 115, 85, 95],
+    [105, 118, 82, 92],
+    [108, 122, 88, 94]
+]
+
+emit "=== Compressão de Imagem ==="
+emit "Original: 4x4 = 16 parâmetros"
+
+// Comprime mantendo 95% da energia
+let comprimida = compress_image(imagem, 0.95)
+
+emit "Compressão concluída"

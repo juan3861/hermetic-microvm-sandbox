@@ -1,0 +1,18 @@
+// FizzBuzz — GenesisLang
+fn main() {
+    for i in 1..101 {
+        if i % 15 == 0 {
+            emit "FizzBuzz"
+        } else {
+            if i % 3 == 0 {
+                emit "Fizz"
+            } else {
+                if i % 5 == 0 {
+                    emit "Buzz"
+                } else {
+                    emit i
+                }
+            }
+        }
+    }
+}
