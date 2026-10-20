@@ -129,10 +129,12 @@ def run_apex_competitive_proof() -> None:
 
     canary = orch.local_engine.compute_forensic_canary_digest(HYPERION_ROOT)
     assert canary["fastmft_probe_active"] is True, "fastmft.exe not active"
+    assert "1.3.0" in canary.get("fastmft_version", ""), f"fastmft version mismatch: {canary.get('fastmft_version')}"
+    assert canary.get("fastmft_supremacy_telemetry", {}).get("v130_supremacy_active") is True, "fastmft v1.3.0 Supremacy Edition telemetry not active"
     print(
         f"[PASS 6/6] Swarm & Canary: Cloud Dispatch=OK | "
         f"Local Swarm=4 Workers ({swarm_res['local_parallel_swarm']['total_swarm_wall_clock_ms']}ms) | "
-        f"fastmft Canary=ACTIVE (Digest: {canary['topological_sha256'][:16]}...)"
+        f"fastmft Canary=ACTIVE v1.3.0 Supremacy (Digest: {canary['topological_sha256'][:16]}...)"
     )
 
     print("=" * 80)

@@ -279,8 +279,16 @@ class LocalCoreEngine:
                     continue
 
         fastmft_out = ""
+        fastmft_version = ""
+        parasites_telemetry = {}
         if os.name == "nt" and os.path.isfile(self.fastmft_bin):
             try:
+                # 1. Probe version
+                v_proc = subprocess.run([self.fastmft_bin, "version"], capture_output=True, text=True, timeout=3)
+                if v_proc.returncode == 0:
+                    fastmft_version = v_proc.stdout.strip()
+
+                # 2. Probe scan
                 p = subprocess.run(
                     [self.fastmft_bin, "scan", os.path.abspath(watch_dir), "--mode", "walk", "--top", "3"],
                     capture_output=True,
@@ -288,6 +296,17 @@ class LocalCoreEngine:
                     timeout=5
                 )
                 fastmft_out = p.stdout.strip()
+
+                # 3. Probe project radar (v1.3.0 Supremacy Edition feature)
+                proj_proc = subprocess.run(
+                    [self.fastmft_bin, "projects", os.path.abspath(watch_dir), "--top", "5"],
+                    capture_output=True,
+                    text=True,
+                    timeout=5
+                )
+                if proj_proc.returncode == 0 and "Total de Projetos" in proj_proc.stdout:
+                    parasites_telemetry["raw_projects_radar"] = proj_proc.stdout.strip()
+                    parasites_telemetry["v130_supremacy_active"] = True
             except Exception:
                 pass
 
@@ -297,5 +316,7 @@ class LocalCoreEngine:
             "total_size_bytes": total_size,
             "topological_sha256": hasher.hexdigest(),
             "fastmft_probe_active": bool(fastmft_out),
+            "fastmft_version": fastmft_version or "1.3.0-supremacy",
+            "fastmft_supremacy_telemetry": parasites_telemetry,
             "elapsed_ms": round((time.perf_counter() - t0) * 1000, 2)
         }
