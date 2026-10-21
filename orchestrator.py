@@ -98,6 +98,9 @@ class TitanHyperionOrchestrator:
         self._formal_prover = None
         self._gpu_engine = None
         self._mesh_swarm = None
+        self._oci_unpacker = None
+        self._watchdog = None
+        self._syscall_fuzzer = None
 
     @property
     def cloud_engine(self):
@@ -250,6 +253,51 @@ class TitanHyperionOrchestrator:
     def stream_mesh_snapshot(self, session_id: str, tag: str = "ckpt_mesh") -> Dict[str, Any]:
         """Streams a live microvm snapshot across nodes with UCIP tensor compression."""
         return self.mesh_swarm.stream_snapshot_with_ucip(session_id=session_id, checkpoint_tag=tag)
+
+    @property
+    def oci_unpacker(self):
+        if self._oci_unpacker is None:
+            from mcp.oci_image_unpacker import OCIImageUnpacker
+            self._oci_unpacker = OCIImageUnpacker()
+        return self._oci_unpacker
+
+    @oci_unpacker.setter
+    def oci_unpacker(self, val):
+        self._oci_unpacker = val
+
+    @property
+    def watchdog(self):
+        if self._watchdog is None:
+            from core.fault_tolerant_watchdog import FaultTolerantWatchdog
+            self._watchdog = FaultTolerantWatchdog(session_manager=self.session_manager)
+        return self._watchdog
+
+    @watchdog.setter
+    def watchdog(self, val):
+        self._watchdog = val
+
+    @property
+    def syscall_fuzzer(self):
+        if self._syscall_fuzzer is None:
+            from security.adversarial_syscall_fuzzer import AdversarialSyscallFuzzer
+            self._syscall_fuzzer = AdversarialSyscallFuzzer()
+        return self._syscall_fuzzer
+
+    @syscall_fuzzer.setter
+    def syscall_fuzzer(self, val):
+        self._syscall_fuzzer = val
+
+    def unpack_oci_image(self, oci_dir: str, dest_bundle: str) -> Dict[str, Any]:
+        """Unpacks an OCI image layout into a runnable bundle without root."""
+        return self.oci_unpacker.unpack_oci_image(Path(oci_dir), Path(dest_bundle))
+
+    def execute_with_watchdog(self, session_id: str, command: str, args: Optional[List[str]] = None) -> Dict[str, Any]:
+        """Executes a command with autonomous auto-healing rollback upon segfault/OOM."""
+        return self.watchdog.execute_with_auto_healing(session_id=session_id, command=command, args=args)
+
+    def run_syscall_fuzz_audit(self) -> Dict[str, Any]:
+        """Runs the 100-probe adversarial syscall fuzzing battery."""
+        return self.syscall_fuzzer.run_fuzz_audit()
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -908,6 +956,20 @@ def main():
     mesh_p.add_argument("--session-id", default="sess_mesh_live", help="Session ID for snapshot streaming")
     mesh_p.add_argument("--gpu", action="store_true", help="Require GPU node for dispatch")
 
+    # Command: oci-unpack (Rootless OCI Image Layout Extraction)
+    unpack_p = subparsers.add_parser("oci-unpack", help="Rootless OCI Image Layer extraction into runnable bundle")
+    unpack_p.add_argument("--image-dir", required=True, help="Directory containing OCI image layout")
+    unpack_p.add_argument("--dest-bundle", required=True, help="Destination bundle directory")
+
+    # Command: watchdog (Fault-tolerant microvm auto-healing execution)
+    wd_p = subparsers.add_parser("watchdog", help="Fault-tolerant execution with auto-healing rollback")
+    wd_p.add_argument("--id", required=True, help="Session ID")
+    wd_p.add_argument("--cmd", required=True, help="Command to execute")
+    wd_p.add_argument("--args", nargs="*", default=None, help="Command arguments")
+
+    # Command: fuzz (Adversarial 100-probe syscall fuzzing battery)
+    fuzz_p = subparsers.add_parser("fuzz", help="Run 100-probe adversarial syscall fuzzing battery")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -968,6 +1030,12 @@ def main():
                 res = orch.dispatch_mesh_job(command=args.cmd, require_gpu=args.gpu)
             elif args.action == "stream":
                 res = orch.stream_mesh_snapshot(session_id=args.session_id)
+        elif args.command == "oci-unpack":
+            res = orch.unpack_oci_image(args.image_dir, args.dest_bundle)
+        elif args.command == "watchdog":
+            res = orch.execute_with_watchdog(session_id=args.id, command=args.cmd, args=args.args)
+        elif args.command == "fuzz":
+            res = orch.run_syscall_fuzz_audit()
         elif args.command == "mcp":
             from mcp.hyperion_mcp_server import run_stdio_server
             run_stdio_server()

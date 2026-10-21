@@ -30,6 +30,15 @@ class GVisorSentryGuard:
         "syslog", "vmsplice", "userfaultfd"
     }
 
+    FORBIDDEN_COMMANDS: Set[str] = {
+        "insmod", "rmmod", "modprobe", "kexec", "strace", "reboot", "shutdown",
+        "poweroff", "mkfs", "fdisk", "parted"
+    }
+
+    FORBIDDEN_SOCKET_TYPES: Set[str] = {
+        "SOCK_RAW", "AF_PACKET", "IPPROTO_RAW"
+    }
+
     RESTRICTED_NETWORK_TARGETS: Set[str] = {
         "169.254.169.254",  # Cloud Instance Metadata Service (AWS/Azure/GCP)
         "metadata.google.internal",
@@ -77,6 +86,14 @@ class GVisorSentryGuard:
         for syscall in self.FORBIDDEN_SYSCALLS:
             if re.search(rf"\b{syscall}\b", source_code):
                 violations.append(f"FORBIDDEN_SYSCALL_INVOCATION: {syscall}")
+
+        for cmd in self.FORBIDDEN_COMMANDS:
+            if re.search(rf"\b{cmd}\b", source_code):
+                violations.append(f"FORBIDDEN_COMMAND_DETECTED: {cmd}")
+
+        for sock_type in self.FORBIDDEN_SOCKET_TYPES:
+            if sock_type in source_code:
+                violations.append(f"RAW_SOCKET_CREATION_DETECTED: {sock_type}")
 
         for target in self.RESTRICTED_NETWORK_TARGETS:
             if target in source_code:
@@ -129,7 +146,7 @@ class GVisorSentryGuard:
         lowered = bash_script.lower()
 
         patterns = [
-            (r"\binsmod\b|\brmmod\b|\bmodprobe\b", "KERNEL_MODULE_TAMPERING"),
+            (r"\binsmod\b|\brmmod\b|\bmodprobe\b|\bkexec\b|\bstrace\b", "KERNEL_MODULE_TAMPERING"),
             (r"\bmount\b|\bumount\b", "FILESYSTEM_MOUNT_ATTACK"),
             (r"\bchroot\b|\bpivot_root\b", "ROOT_ESCAPE_ATTEMPT"),
             (r":\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:", "FORK_BOMB_PATTERN"),
