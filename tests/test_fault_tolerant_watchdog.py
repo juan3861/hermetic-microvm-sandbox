@@ -51,6 +51,7 @@ def run_watchdog_audit():
         assert res2["crash_intercepted"] is True
         assert res2["self_healed"] is True
         assert res2["signal"] == "SIGSEGV"
+        assert res2["recovery"]["recovered"] is True
 
         # 3. Post-heal verification
         print("\n[3/3] Verifying Workspace Integrity After Self-Healing...")

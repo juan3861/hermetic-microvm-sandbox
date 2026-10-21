@@ -78,7 +78,7 @@ class FaultTolerantWatchdog:
                 "returncode": returncode,
                 "signal": sig_name,
                 "description": sig_desc,
-                "recovered": rollback_res.get("status") == "RESTORED",
+                "recovered": (rollback_res.get("ok") is True or rollback_res.get("action") == "ROLLBACK_SUCCESSFUL" or rollback_res.get("state") == "PRISTINE_RESTORED"),
                 "clean_checkpoint": clean_checkpoint_tag,
                 "rollback_latency_ms": heal_ms,
                 "timestamp": time.time()
