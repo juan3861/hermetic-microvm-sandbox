@@ -745,6 +745,12 @@ def main():
     # Command: prove
     prove_p = subparsers.add_parser("prove", help="Formally prove SOMA and capability invariants via Z3 SMT")
 
+    # Command: oci
+    oci_p = subparsers.add_parser("oci", help="OCI standard container lifecycle operations")
+    oci_p.add_argument("--action", choices=["create", "start", "state", "delete"], required=True)
+    oci_p.add_argument("--id", required=True, help="Container ID")
+    oci_p.add_argument("--bundle", default=None, help="Bundle directory containing config.json")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -781,6 +787,17 @@ def main():
         res = orch.attest_environment(nonce=args.nonce)
     elif args.command == "prove":
         res = orch.prove_formal_invariants()
+    elif args.command == "oci":
+        act = args.action
+        if act == "create":
+            res = orch.oci_shim.create_container(args.id, Path(args.bundle) if args.bundle else Path("."))
+        elif act == "start":
+            res = orch.oci_shim.start_container(args.id)
+        elif act == "state":
+            res = orch.oci_shim.get_state(args.id)
+        elif act == "delete":
+            ok = orch.oci_shim.delete_container(args.id)
+            res = {"ok": ok, "id": args.id}
     elif args.command == "mcp":
         from mcp.hyperion_mcp_server import run_stdio_server
         run_stdio_server()
