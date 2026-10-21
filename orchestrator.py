@@ -46,21 +46,12 @@ from core.soma_governor import (
     SandboxTrustLevel,
     SandboxExecutionPhase,
 )
-from core.quantum_math_cortex import QuantumMathCortex
-from core.agi_cartographer import QuantumTopologicalCartographer
-from core.capsule_distiller import CapsuleDistiller
-from compiler_fusion.multi_repo_synthesizer import MultiRepositorySynthesizer
-from engines.cloud_cascade import CloudCascadeEngine
 from engines.local_core import LocalCoreEngine
-from engines.swarm_dispatcher import CloudSwarmDispatcher
 from engines.polyglot_jail import PolyglotJailEngine
-from security.adversarial_redteam import AdversarialRedTeam
-from benchmarking.competitive_matrix import CompetitiveBenchmarkSuite
-from core.time_travel_engine import TimeTravelEngine
-from security.gvisor_sentry_guard import GVisorSentryGuard
 from engines.demand_paging_engine import DemandPagingEngine
 from engines.landlock_crun_engine import LandlockCrunEngine
 from engines.wasm_runtime_engine import WasmRuntimeEngine
+from security.gvisor_sentry_guard import GVisorSentryGuard
 from security.behavioral_ebpf_monitor import BehavioralEBPFMonitor
 from core.sel4_capability_matrix import SeL4CapabilityMatrix, CapRight
 from core.mythos_recurrent_depth import MythosRecurrentDepthEngine
@@ -69,7 +60,6 @@ from silicon_core.silicon_bridge import SiliconBridge
 from engines.native_hypervisor_vmm import NativeHypervisorVMMEngine
 from security.confidential_attestation_engine import ConfidentialAttestationEngine
 from mcp.oci_runtime_shim import OCIRuntimeShim
-from core.formal_invariants_prover import FormalInvariantsProver
 
 
 class TitanHyperionOrchestrator:
@@ -82,17 +72,17 @@ class TitanHyperionOrchestrator:
 
     def __init__(self):
         self.governor = SomaThermodynamicGovernor()
-        self.cortex = QuantumMathCortex()
-        self.cloud_engine = CloudCascadeEngine()
+        self._cortex = None
+        self._cloud_engine = None
         self.local_engine = LocalCoreEngine()
-        self.cartographer = QuantumTopologicalCartographer()
-        self.distiller = CapsuleDistiller()
-        self.synthesizer = MultiRepositorySynthesizer()
-        self.swarm_dispatcher = CloudSwarmDispatcher()
+        self._cartographer = None
+        self._distiller = None
+        self._synthesizer = None
+        self._swarm_dispatcher = None
         self.polyglot_jail = PolyglotJailEngine()
-        self.redteam = AdversarialRedTeam()
-        self.benchmarker = CompetitiveBenchmarkSuite()
-        self.time_travel = TimeTravelEngine()
+        self._redteam = None
+        self._benchmarker = None
+        self._time_travel = None
         self.sentry_guard = GVisorSentryGuard()
         self.demand_paging = DemandPagingEngine()
         self.landlock_engine = LandlockCrunEngine()
@@ -105,7 +95,117 @@ class TitanHyperionOrchestrator:
         self.vmm = NativeHypervisorVMMEngine()
         self.attestation = ConfidentialAttestationEngine()
         self.oci_shim = OCIRuntimeShim()
-        self.formal_prover = FormalInvariantsProver()
+        self._formal_prover = None
+
+    @property
+    def cloud_engine(self):
+        if self._cloud_engine is None:
+            from engines.cloud_cascade import CloudCascadeEngine
+            self._cloud_engine = CloudCascadeEngine()
+        return self._cloud_engine
+
+    @cloud_engine.setter
+    def cloud_engine(self, val):
+        self._cloud_engine = val
+
+    @property
+    def swarm_dispatcher(self):
+        if self._swarm_dispatcher is None:
+            from engines.swarm_dispatcher import CloudSwarmDispatcher
+            self._swarm_dispatcher = CloudSwarmDispatcher()
+        return self._swarm_dispatcher
+
+    @swarm_dispatcher.setter
+    def swarm_dispatcher(self, val):
+        self._swarm_dispatcher = val
+
+    @property
+    def cortex(self):
+        if self._cortex is None:
+            from core.quantum_math_cortex import QuantumMathCortex
+            self._cortex = QuantumMathCortex()
+        return self._cortex
+
+    @cortex.setter
+    def cortex(self, val):
+        self._cortex = val
+
+    @property
+    def cartographer(self):
+        if self._cartographer is None:
+            from core.agi_cartographer import QuantumTopologicalCartographer
+            self._cartographer = QuantumTopologicalCartographer()
+        return self._cartographer
+
+    @cartographer.setter
+    def cartographer(self, val):
+        self._cartographer = val
+
+    @property
+    def distiller(self):
+        if self._distiller is None:
+            from core.capsule_distiller import CapsuleDistiller
+            self._distiller = CapsuleDistiller()
+        return self._distiller
+
+    @distiller.setter
+    def distiller(self, val):
+        self._distiller = val
+
+    @property
+    def synthesizer(self):
+        if self._synthesizer is None:
+            from compiler_fusion.multi_repo_synthesizer import MultiRepositorySynthesizer
+            self._synthesizer = MultiRepositorySynthesizer()
+        return self._synthesizer
+
+    @synthesizer.setter
+    def synthesizer(self, val):
+        self._synthesizer = val
+
+    @property
+    def benchmarker(self):
+        if self._benchmarker is None:
+            from benchmarking.competitive_matrix import CompetitiveBenchmarkSuite
+            self._benchmarker = CompetitiveBenchmarkSuite()
+        return self._benchmarker
+
+    @benchmarker.setter
+    def benchmarker(self, val):
+        self._benchmarker = val
+
+    @property
+    def redteam(self):
+        if self._redteam is None:
+            from security.adversarial_redteam import AdversarialRedTeam
+            self._redteam = AdversarialRedTeam()
+        return self._redteam
+
+    @redteam.setter
+    def redteam(self, val):
+        self._redteam = val
+
+    @property
+    def time_travel(self):
+        if self._time_travel is None:
+            from core.time_travel_engine import TimeTravelEngine
+            self._time_travel = TimeTravelEngine()
+        return self._time_travel
+
+    @time_travel.setter
+    def time_travel(self, val):
+        self._time_travel = val
+
+    @property
+    def formal_prover(self):
+        if self._formal_prover is None:
+            from core.formal_invariants_prover import FormalInvariantsProver
+            self._formal_prover = FormalInvariantsProver()
+        return self._formal_prover
+
+    @formal_prover.setter
+    def formal_prover(self, val):
+        self._formal_prover = val
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -759,55 +859,58 @@ def main():
     args = parser.parse_args()
     orch = TitanHyperionOrchestrator()
 
-    if args.command == "cartography":
-        res = orch.cartograph_repository(target_dir=args.target, grover_keywords=args.keywords)
-    elif args.command == "distill":
-        res = orch.distill_and_verify_capsule(source_file_path=args.file, target_symbol=args.symbol)
-    elif args.command == "fuse":
-        res = orch.fuse_repositories(repo_a_path=args.repo_a, repo_b_path=args.repo_b, intent_a=args.intent_a, intent_b=args.intent_b)
-    elif args.command == "swarm":
-        res = orch.dispatch_swarm(mode=args.mode, total_local_workers=args.workers)
-    elif args.command == "polyglot":
-        res = orch.execute_polyglot(code=args.code, language=args.lang, timeout_sec=args.timeout)
-    elif args.command == "redteam":
-        res = orch.run_redteam_armor_suite(watch_dir=args.watch_dir)
-    elif args.command == "benchmark":
-        res = orch.run_competitive_benchmark()
-    elif args.command == "sentry":
-        res = orch.audit_sentry_guard(code=args.code, language=args.lang)
-    elif args.command == "wasm":
-        res = orch.execute_wasm(wat_or_wasm_hex="HEX:DEFAULT_ADD", export_func_name=args.func, func_args=args.args)
-    elif args.command == "mythos":
-        res = orch.evaluate_mythos(objective=args.objective)
-    elif args.command == "session":
-        res = orch.manage_microvm_session(action=args.action, session_id=args.id, tag_or_cmd=args.tag_or_cmd, args=args.args)
-    elif args.command == "hypervisor":
-        res = orch.query_hypervisor()
-    elif args.command == "attestation":
-        res = orch.attest_environment(nonce=args.nonce)
-    elif args.command == "prove":
-        res = orch.prove_formal_invariants()
-    elif args.command == "oci":
-        act = args.action
-        if act == "create":
-            res = orch.oci_shim.create_container(args.id, Path(args.bundle) if args.bundle else Path("."))
-        elif act == "start":
-            res = orch.oci_shim.start_container(args.id)
-        elif act == "state":
-            res = orch.oci_shim.get_state(args.id)
-        elif act == "delete":
-            ok = orch.oci_shim.delete_container(args.id)
-            res = {"ok": ok, "id": args.id}
-    elif args.command == "mcp":
-        from mcp.hyperion_mcp_server import run_stdio_server
-        run_stdio_server()
-        return
-    else:
-        # Default mission
-        target_path = getattr(args, "target", r"F:\UCIP")
-        remote_url = getattr(args, "remote_url", "https://github.com/juan3861/UCIP.git")
-        lang = getattr(args, "lang", "python")
-        res = orch.execute_full_mission(repo_target=target_path, remote_git_url=remote_url, primary_language=lang)
+    try:
+        if args.command == "cartography":
+            res = orch.cartograph_repository(target_dir=args.target, grover_keywords=args.keywords)
+        elif args.command == "distill":
+            res = orch.distill_and_verify_capsule(source_file_path=args.file, target_symbol=args.symbol)
+        elif args.command == "fuse":
+            res = orch.fuse_repositories(repo_a_path=args.repo_a, repo_b_path=args.repo_b, intent_a=args.intent_a, intent_b=args.intent_b)
+        elif args.command == "swarm":
+            res = orch.dispatch_swarm(mode=args.mode, total_local_workers=args.workers)
+        elif args.command == "polyglot":
+            res = orch.execute_polyglot(code=args.code, language=args.lang, timeout_sec=args.timeout)
+        elif args.command == "redteam":
+            res = orch.run_redteam_armor_suite(watch_dir=args.watch_dir)
+        elif args.command == "benchmark":
+            res = orch.run_competitive_benchmark()
+        elif args.command == "sentry":
+            res = orch.audit_sentry_guard(code=args.code, language=args.lang)
+        elif args.command == "wasm":
+            res = orch.execute_wasm(wat_or_wasm_hex="HEX:DEFAULT_ADD", export_func_name=args.func, func_args=args.args)
+        elif args.command == "mythos":
+            res = orch.evaluate_mythos(objective=args.objective)
+        elif args.command == "session":
+            res = orch.manage_microvm_session(action=args.action, session_id=args.id, tag_or_cmd=args.tag_or_cmd, args=args.args)
+        elif args.command == "hypervisor":
+            res = orch.query_hypervisor()
+        elif args.command == "attestation":
+            res = orch.attest_environment(nonce=args.nonce)
+        elif args.command == "prove":
+            res = orch.prove_formal_invariants()
+        elif args.command == "oci":
+            act = args.action
+            if act == "create":
+                res = orch.oci_shim.create_container(args.id, Path(args.bundle) if args.bundle else Path("."))
+            elif act == "start":
+                res = orch.oci_shim.start_container(args.id)
+            elif act == "state":
+                res = orch.oci_shim.get_state(args.id)
+            elif act == "delete":
+                ok = orch.oci_shim.delete_container(args.id)
+                res = {"ok": ok, "id": args.id}
+        elif args.command == "mcp":
+            from mcp.hyperion_mcp_server import run_stdio_server
+            run_stdio_server()
+            return
+        else:
+            # Default mission
+            target_path = getattr(args, "target", r"F:\UCIP")
+            remote_url = getattr(args, "remote_url", "https://github.com/juan3861/UCIP.git")
+            lang = getattr(args, "lang", "python")
+            res = orch.execute_full_mission(repo_target=target_path, remote_git_url=remote_url, primary_language=lang)
+    except Exception as exc:
+        res = {"ok": False, "error": str(exc), "command": args.command}
 
     print(json.dumps(res, indent=2))
     if not res.get("ok", True):

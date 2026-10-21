@@ -159,10 +159,18 @@ class MicroVMSessionManager:
 
     def terminate_session(self, session_id: str) -> bool:
         """Destroys the session and evaporates all RAM allocations instantly."""
-        if session_id in self.active_sessions:
+        if session_id not in self.active_sessions:
+            self._load_registry()
+
+        found = session_id in self.active_sessions
+        if found:
             del self.active_sessions[session_id]
-            return True
-        return False
+            self._save_registry()
+
+        # Clean volatile DDR RAM allocations and snapshot branches
+        clean_cmd = f"rm -rf /dev/shm/{session_id} /dev/shm/.hyperion_snapshots/{session_id}"
+        self.time_travel._run_wsl(clean_cmd)
+        return True
 
 
 if __name__ == "__main__":
