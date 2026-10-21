@@ -25,6 +25,8 @@ from core.microvm_session_manager import MicroVMSessionManager
 from core.stateful_repl_engine import StatefulREPLEngine, REPLExecutionResult
 from silicon_core.silicon_bridge import SiliconBridge
 from security.secret_sanitizer import SecretSanitizer
+from core.pty_manager import SandboxPTYManager, PTYSession
+from core.replay_recorder import ReplayRecorder, ReplayEngine
 
 ExecutionResult = REPLExecutionResult
 
@@ -73,9 +75,10 @@ class Process:
 class SandboxFiles:
     """Filesystem operations confined strictly to the volatile DDR RAM workspace."""
 
-    def __init__(self, session_id: str, ram_path: str):
+    def __init__(self, session_id: str, ram_path: str, recorder: Optional[ReplayRecorder] = None):
         self.session_id = session_id
         self.ram_path = ram_path
+        self.recorder = recorder
 
     def _run_wsl(self, cmd: str) -> subprocess.CompletedProcess:
         return subprocess.run(
@@ -95,6 +98,8 @@ class SandboxFiles:
             b_data = content
         b64 = base64.b64encode(b_data).decode("ascii")
         self._run_wsl(f"echo '{b64}' | base64 -d > '{target}'")
+        if self.recorder:
+            self.recorder.record_file_write(path, len(b_data), str(content)[:64])
 
     def read(self, path: str) -> str:
         """Reads a file from the volatile RAM sandbox."""
@@ -133,9 +138,10 @@ class SandboxFiles:
 class SandboxCommands:
     """Command execution conduit using Silicon Native C launcher and Bubblewrap isolation."""
 
-    def __init__(self, session_id: str, ram_path: str):
+    def __init__(self, session_id: str, ram_path: str, recorder: Optional[ReplayRecorder] = None):
         self.session_id = session_id
         self.ram_path = ram_path
+        self.recorder = recorder
         self.silicon = SiliconBridge()
         self.sanitizer = SecretSanitizer()
 
@@ -149,12 +155,15 @@ class SandboxCommands:
         raw_stdout = exec_res.get("stdout", "")
         raw_stderr = exec_res.get("stderr", "")
 
-        return CommandResult(
+        res = CommandResult(
             stdout=self.sanitizer.sanitize(raw_stdout),
             stderr=self.sanitizer.sanitize(raw_stderr),
             exit_code=exec_res.get("returncode", 0),
             elapsed_ms=elapsed
         )
+        if self.recorder:
+            self.recorder.record_command(cmd, res.exit_code, elapsed)
+        return res
 
     def run_stream(self, cmd: str, env: Optional[Dict[str, str]] = None, timeout: int = 45):
         """Yields real-time sanitized StreamChunk events as output arrives."""
@@ -205,10 +214,12 @@ class Sandbox:
             cpu_sec=self.timeout
         )
 
-        self.files = SandboxFiles(session_id=self.id, ram_path=self.ram_path)
-        self.commands = SandboxCommands(session_id=self.id, ram_path=self.ram_path)
+        self.recorder = ReplayRecorder(session_id=self.id)
+        self.files = SandboxFiles(session_id=self.id, ram_path=self.ram_path, recorder=self.recorder)
+        self.commands = SandboxCommands(session_id=self.id, ram_path=self.ram_path, recorder=self.recorder)
         self.process = SandboxProcessManager(commands=self.commands)
         self.repl = StatefulREPLEngine(session_id=self.id, ram_workspace=self.ram_path)
+        self.pty = SandboxPTYManager(session_id=self.id, ram_workspace=self.ram_path)
         self.closed = False
 
     def run_code(self, code: str, language: str = "python") -> REPLExecutionResult:
@@ -216,7 +227,10 @@ class Sandbox:
         Executes Python code statefully inside the persistent sandbox namespace.
         Variables, functions, and imports are retained across sequential calls.
         """
-        return self.repl.execute_code(code)
+        res = self.repl.execute_code(code)
+        if self.recorder:
+            self.recorder.record_code_eval(code, res.error is None, str(res.result), res.elapsed_ms)
+        return res
 
     def run_code_stream(self, code: str, language: str = "python"):
         """
@@ -237,15 +251,30 @@ class Sandbox:
 
     def take_snapshot(self, tag: str = "ckpt_auto") -> Dict[str, Any]:
         """Creates an instantaneous microsecond snapshot."""
-        return self.manager.checkpoint(self.id, tag)
+        res = self.manager.checkpoint(self.id, tag)
+        if self.recorder:
+            self.recorder.record_snapshot(tag)
+        return res
 
     def restore_snapshot(self, tag: str = "ckpt_auto") -> Dict[str, Any]:
         """Rolls back the volatile workspace to a previous checkpoint."""
-        return self.manager.rollback(self.id, tag)
+        res = self.manager.rollback(self.id, tag)
+        if self.recorder:
+            self.recorder.record_rollback(tag)
+        return res
+
+    def export_trace(self) -> Dict[str, Any]:
+        """Exports the recorded execution trace for deterministic audit and replay."""
+        return self.recorder.export_trace()
+
+    def replay_trace(self, trace_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Replays an exported execution trace within this sandbox."""
+        return ReplayEngine.replay_trace(self, trace_data)
 
     def close(self) -> None:
         """Evaporates the sandbox and all RAM allocations instantly."""
         if not self.closed:
+            self.pty.close_all()
             self.manager.terminate_session(self.id)
             self.closed = True
 

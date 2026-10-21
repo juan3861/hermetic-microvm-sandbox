@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "hermetic-microvm-sandbox"
-version = "2.3.0"
+version = "2.4.0"
 authors = [
   { name="Ruan Novaes", email="ruan@aethermind.ai" },
 ]
-description = "The Ultra-Fast Hermetic MicroVM & Silicon Sandbox for AI Agents — Dual-Engine with Stateful REPL, Real-Time Streaming, Pre-Warmed Pools, Secret Redaction, Zero-Trust Egress, and Formal SMT Proofs."
+description = "The Ultra-Fast Hermetic MicroVM & Silicon Sandbox for AI Agents — Dual-Engine with Interactive PTY, Deterministic Replay, Stateful REPL, Real-Time Streaming, Pre-Warmed Pools, Secret Redaction, and Z3 SMT Formal Proofs."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "Apache-2.0" }

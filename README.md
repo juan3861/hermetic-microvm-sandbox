@@ -189,11 +189,21 @@ with Sandbox(memory_mb=512) as sb:
     for chunk in sb.run_code_stream("for i in range(3): print(f'Step {i}')\n100"):
         print(f"[{chunk.channel}] {chunk.text.strip()}")
 
-    # 3. Active Secret Sanitization (TruffleHog/GitGuardian entropy shield)
+    # 3. Interactive Bidirectional PTY (openpty with secret sanitization)
+    pty = sb.pty.create(command="sh", cols=120, rows=40)
+    pty.send_input("echo 'Hello from PTY'\n")
+    print("PTY Output:", pty.read(timeout=0.5))
+    pty.kill()
+
+    # 4. Active Secret Sanitization (TruffleHog/GitGuardian entropy shield)
     leak_test = sb.run_code("print('LEAK: sk-proj-1234567890abcdef1234567890')")
     print("Sanitized Output:", leak_test.stdout)  # sk-***[REDACTED_OPENAI_KEY]***
 
-    # 4. Microsecond snapshotting & instant rollback
+    # 5. Deterministic Execution Trajectory Export & Replay
+    trace = sb.export_trace()
+    print("Execution Events Recorded:", trace["event_count"])
+
+    # 6. Microsecond snapshotting & instant rollback
     sb.take_snapshot("ckpt_before_edit")
     # ... if agent mutates workspace ...
     sb.restore_snapshot("ckpt_before_edit")

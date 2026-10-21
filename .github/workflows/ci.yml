@@ -48,11 +48,13 @@ jobs:
         python orchestrator.py egress --target 169.254.169.254
         python orchestrator.py metrics --format prometheus
         python orchestrator.py sanitize --text "My secret sk-12345678901234567890"
+        python orchestrator.py pty --cmd "echo 'CI_PTY_OK'"
+        python orchestrator.py replay
         python orchestrator.py gpu --action probe
         python orchestrator.py fuzz
         python orchestrator.py mesh --action status
 
-    - name: Execute Full 21 Master Test Suites
+    - name: Execute Full 23 Master Test Suites
       run: |
         set -e
         for test_file in tests/test_*.py; do

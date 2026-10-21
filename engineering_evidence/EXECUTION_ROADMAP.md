@@ -1,29 +1,46 @@
-# EXECUTION ROADMAP & DAG — MASTER PROMPT V2
-**System:** Hermetic MicroVM Sandbox v2.3.0  
-**Timestamp:** 2026-10-21T16:51:00-03:00  
+# EXECUTION ROADMAP — DAG IMPLEMENTATION PLAN (ROUND 3)
+**System:** Hermetic MicroVM Sandbox v2.4.0  
+**Timestamp:** 2026-10-21T17:37:00-03:00  
 
 ---
 
-## 1. Directed Acyclic Graph (DAG) de Implementação
+## 1. Grafo Acíclico Dirigido (DAG) de Tarefas
 
 ```mermaid
 flowchart TD
-    T0["Freeze Acceptance Contract (ACCEPTANCE_CONTRACT.md)"] --> T1["Implement SecretSanitizer (security/secret_sanitizer.py)"]
-    T1 --> T2["Integrate Secret Sanitizer in REPL & Sandbox SDK"]
-    T0 --> T3["Implement Streaming Generator (sdk/hermetic_sandbox.py)"]
-    T2 & T3 --> T4["Update orchestrator.py CLI & Telemetry"]
-    T4 --> T5["Build Mutation & Invariant Test Suite (test_mutation_and_invariants.py)"]
-    T5 --> T6["Build Secret Sanitizer Test Suite (test_secret_sanitizer.py)"]
-    T6 --> T7["Batch Regression Test (All 21 Suites)"]
-    T7 --> T8["Strict Auditor Certification (AetherMind_Strict_Auditor.py)"]
-    T8 --> T9["Independent Adversarial Audit by Subagent"]
-    T9 --> T10["Final Acceptance, Commit & Push"]
+    Contract["ACCEPTANCE_CONTRACT.md (Frozen v2.1)"] --> D1["DAG-1: core/pty_manager.py"]
+    Contract --> D3["DAG-3: core/replay_recorder.py"]
+    Contract --> D5["DAG-5: core/formal_invariants_prover.py (Thm 4 & 5)"]
+    
+    D1 --> D2["DAG-2: sdk/hermetic_sandbox.py (sandbox.pty integration)"]
+    D3 --> D4["DAG-4: sdk/hermetic_sandbox.py (sandbox.replay integration)"]
+    
+    D2 --> D6["DAG-6: tests/test_interactive_pty.py"]
+    D4 --> D7["DAG-7: tests/test_deterministic_replay.py"]
+    D5 --> D8["DAG-8: orchestrator.py (CLI pty & replay)"]
+    
+    D6 --> D9["DAG-9: Full 23 Test Suites Execution & Strict Auditor"]
+    D7 --> D9
+    D8 --> D9
+    
+    D9 --> D10["DAG-10: Independent Adversarial Subagent Audit"]
+    D10 --> D11["DAG-11: AUDIT_DECISION.md & Git Commit v2.4.0"]
 ```
 
 ---
 
-## 2. Caminho Crítico e Priorização
-- **P0 (Crítico):** `security/secret_sanitizer.py` (Prevenção de vazamento de credenciais).
-- **P1 (Funcional):** Streaming generator em `sdk/hermetic_sandbox.py`.
-- **P2 (Adversarial):** Bateria de testes de mutação e invariantes.
-- **P3 (Auditoria):** Execução independente pelo subagente e veredito do auditor.
+## 2. Tarefas e Arquivos Afetados
+
+| Task ID | Descrição | Arquivos Afetados | Risco & Rollback |
+|---|---|---|---|
+| **DAG-1** | Implementar `core/pty_manager.py` (PTYSession, openpty bridge, non-blocking I/O) | `core/pty_manager.py` | Baixo (módulo novo) |
+| **DAG-2** | Integrar PTY em `sdk/hermetic_sandbox.py` | `sdk/hermetic_sandbox.py`, `hermetic_sandbox.py` | Baixo (aditivo) |
+| **DAG-3** | Implementar `core/replay_recorder.py` (Trajectory ledger, hashing, replay) | `core/replay_recorder.py` | Baixo (módulo novo) |
+| **DAG-4** | Integrar Replay no `Sandbox` (`export_trace`, `replay_trace`) | `sdk/hermetic_sandbox.py` | Baixo (aditivo) |
+| **DAG-5** | Adicionar Teoremas 4 e 5 em `core/formal_invariants_prover.py` | `core/formal_invariants_prover.py` | Baixo (aditivo) |
+| **DAG-6** | Criar suíte de teste `tests/test_interactive_pty.py` | `tests/test_interactive_pty.py` | Baixo |
+| **DAG-7** | Criar suíte de teste `tests/test_deterministic_replay.py` | `tests/test_deterministic_replay.py` | Baixo |
+| **DAG-8** | Integrar CLI `pty` e `replay` no `orchestrator.py` | `orchestrator.py`, `pyproject.toml`, `.github/workflows/ci.yml` | Baixo |
+| **DAG-9** | Executar as 23 suítes completas de testes sob o `AetherMind_Strict_Auditor.py` | Ambiente Host | Zero risco de regressão |
+| **DAG-10**| Submeter a auditor independente adversarial (Agente 2) | Subagente cognitivo | Zero risco |
+| **DAG-11**| Documentar evidências e sincronizar com GitHub | `engineering_evidence/`, git remote | Conclusão |
