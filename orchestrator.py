@@ -55,6 +55,13 @@ from engines.swarm_dispatcher import CloudSwarmDispatcher
 from engines.polyglot_jail import PolyglotJailEngine
 from security.adversarial_redteam import AdversarialRedTeam
 from benchmarking.competitive_matrix import CompetitiveBenchmarkSuite
+from core.time_travel_engine import TimeTravelEngine
+from security.gvisor_sentry_guard import GVisorSentryGuard
+from engines.demand_paging_engine import DemandPagingEngine
+from engines.landlock_crun_engine import LandlockCrunEngine
+from engines.wasm_runtime_engine import WasmRuntimeEngine
+from security.behavioral_ebpf_monitor import BehavioralEBPFMonitor
+from core.sel4_capability_matrix import SeL4CapabilityMatrix, CapRight
 
 
 class TitanHyperionOrchestrator:
@@ -77,6 +84,13 @@ class TitanHyperionOrchestrator:
         self.polyglot_jail = PolyglotJailEngine()
         self.redteam = AdversarialRedTeam()
         self.benchmarker = CompetitiveBenchmarkSuite()
+        self.time_travel = TimeTravelEngine()
+        self.sentry_guard = GVisorSentryGuard()
+        self.demand_paging = DemandPagingEngine()
+        self.landlock_engine = LandlockCrunEngine()
+        self.wasm_engine = WasmRuntimeEngine()
+        self.ebpf_monitor = BehavioralEBPFMonitor()
+        self.sel4_caps = SeL4CapabilityMatrix()
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -514,6 +528,28 @@ class TitanHyperionOrchestrator:
         """
         return self.benchmarker.generate_competitive_matrix()
 
+    def execute_wasm(
+        self,
+        wat_or_wasm_hex: str,
+        export_func_name: str = "add",
+        func_args: Optional[List[Any]] = None
+    ) -> Dict[str, Any]:
+        """
+        Executes a WebAssembly function inside the in-memory Wasm capability sandbox.
+        """
+        args = func_args if func_args is not None else [40, 2]
+        return self.wasm_engine.execute_wasm_function(
+            wat_or_wasm_hex=wat_or_wasm_hex,
+            export_func_name=export_func_name,
+            func_args=args
+        )
+
+    def audit_sentry_guard(self, code: str, language: str = "python") -> Dict[str, Any]:
+        """
+        Runs gVisor Sentry syscall & proxy policy inspection on untrusted code.
+        """
+        return self.sentry_guard.enforce_sentry_policy(code=code, language=language)
+
 
 def main():
     parser = argparse.ArgumentParser(description="TITAN-HYPERION OMEGA CLI")
@@ -560,6 +596,19 @@ def main():
     # Command: benchmark
     bm_p = subparsers.add_parser("benchmark", help="Generate empirical competitive benchmark matrix")
 
+    # Command: sentry (gVisor Sentry guard)
+    sentry_p = subparsers.add_parser("sentry", help="Run gVisor Sentry syscall & proxy policy audit")
+    sentry_p.add_argument("--code", required=True, help="Code string to audit")
+    sentry_p.add_argument("--lang", default="python", help="Language")
+
+    # Command: wasm (Wasmtime sandbox)
+    wasm_p = subparsers.add_parser("wasm", help="Execute WebAssembly module in microsecond capability sandbox")
+    wasm_p.add_argument("--func", default="add", help="Exported function name")
+    wasm_p.add_argument("--args", nargs="+", type=int, default=[40, 2], help="Function integer arguments")
+
+    # Command: mcp (Model Context Protocol server)
+    mcp_p = subparsers.add_parser("mcp", help="Run standard Model Context Protocol (MCP) stdio server")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -582,6 +631,14 @@ def main():
         res = orch.run_redteam_armor_suite(watch_dir=args.watch_dir)
     elif args.command == "benchmark":
         res = orch.run_competitive_benchmark()
+    elif args.command == "sentry":
+        res = orch.audit_sentry_guard(code=args.code, language=args.lang)
+    elif args.command == "wasm":
+        res = orch.execute_wasm(wat_or_wasm_hex="HEX:DEFAULT_ADD", export_func_name=args.func, func_args=args.args)
+    elif args.command == "mcp":
+        from mcp.hyperion_mcp_server import run_stdio_server
+        run_stdio_server()
+        return
     else:
         # Default mission
         target_path = getattr(args, "target", r"F:\UCIP")

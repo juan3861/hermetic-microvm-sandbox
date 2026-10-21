@@ -173,21 +173,39 @@ orch = TitanHyperionOrchestrator()
 result = orch.execute_polyglot("print(42 * 1337)", language="python")
 print("Execution Result:", result["stdout"])
 
-# 2. Compile and run C code hermetically in RAM
-c_code = """
-#include <stdio.h>
-int main() {
-    printf("Hermetic C: %d\\n", 1337);
-    return 0;
-}
-"""
-c_result = orch.execute_polyglot(c_code, language="c")
-print("C Output:", c_result["stdout"])
+# 2. Time-Travel Debugging (CubeSandbox/Firecracker CoW Rollback)
+orch.time_travel.create_snapshot("agent_sess", "checkpoint_clean")
+# ... if agent corrupts state ...
+orch.time_travel.rollback_to_snapshot("agent_sess", "checkpoint_clean")
 
-# 3. Full Codebase Cartography (SVD + Shannon Entropy + Grover)
-carto = orch.cartograph_repository(target_dir="./core")
-print("Eigenspace Retained Energy:", carto["eigenspace_svd"]["retained_energy"])
+# 3. gVisor Sentry Syscall Interceptor
+audit = orch.audit_sentry_guard("import ctypes; ctypes.CDLL(None).syscall(169)")
+print("Sentry Verdict:", audit["sentry_verdict"])  # DENIED_BY_SENTRY_POLICY
+
+# 4. Microsecond WebAssembly Capability Sandbox (Wasmtime)
+wasm_res = orch.execute_wasm("HEX:DEFAULT_ADD", "add", [2000, 26])
+print("Wasm Result:", wasm_res["result"])  # 2026 (<1 ms)
 ```
+
+---
+
+## 🤖 Model Context Protocol (MCP) Server for AI Agents
+
+Hyperion includes a production-ready **Model Context Protocol (MCP)** JSON-RPC 2.0 server (`mcp/hyperion_mcp_server.py`) for plug-and-play integration with Claude Code, Cursor, and autonomous AGI agents:
+
+```bash
+# Start MCP Server via Stdio
+python -m mcp.hyperion_mcp_server
+# Or via CLI
+hyperion.cmd mcp
+```
+
+### Registered Agent Tools
+- `hyperion_execute_code`: Polyglot execution in zero-wear DDR RAM
+- `hyperion_time_travel_snapshot`: Instant CoW RAM snapshot
+- `hyperion_time_travel_rollback`: Time-travel undo of corrupted state
+- `hyperion_cartograph_codebase`: SVD + Shannon Entropy + Grover search
+- `hyperion_wasm_exec`: Nanosecond Wasm capability execution
 
 ---
 
