@@ -22,7 +22,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 from core.microvm_session_manager import MicroVMSessionManager
+from core.stateful_repl_engine import StatefulREPLEngine, REPLExecutionResult
 from silicon_core.silicon_bridge import SiliconBridge
+
+ExecutionResult = REPLExecutionResult
 
 
 class CommandResult:
@@ -177,7 +180,15 @@ class Sandbox:
         self.files = SandboxFiles(session_id=self.id, ram_path=self.ram_path)
         self.commands = SandboxCommands(session_id=self.id, ram_path=self.ram_path)
         self.process = SandboxProcessManager(commands=self.commands)
+        self.repl = StatefulREPLEngine(session_id=self.id, ram_workspace=self.ram_path)
         self.closed = False
+
+    def run_code(self, code: str, language: str = "python") -> REPLExecutionResult:
+        """
+        Executes Python code statefully inside the persistent sandbox namespace.
+        Variables, functions, and imports are retained across sequential calls.
+        """
+        return self.repl.execute_code(code)
 
     def take_snapshot(self, tag: str = "ckpt_auto") -> Dict[str, Any]:
         """Creates an instantaneous microsecond snapshot."""

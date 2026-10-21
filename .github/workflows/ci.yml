@@ -42,11 +42,16 @@ jobs:
     - name: Test CLI Entrypoints & Capabilities
       run: |
         python orchestrator.py --help
+        python orchestrator.py dashboard
+        python orchestrator.py repl --code "1 + 1"
+        python orchestrator.py pool --action status
+        python orchestrator.py egress --target 169.254.169.254
+        python orchestrator.py metrics --format prometheus
         python orchestrator.py gpu --action probe
         python orchestrator.py fuzz
         python orchestrator.py mesh --action status
 
-    - name: Execute Full 15 Master Test Suites
+    - name: Execute Full 19 Master Test Suites
       run: |
         set -e
         for test_file in tests/test_*.py; do
