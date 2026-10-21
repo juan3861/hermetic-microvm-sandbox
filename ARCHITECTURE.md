@@ -98,3 +98,28 @@ The local engine bypasses heavyweight container daemons (e.g. `dockerd`, `contai
    Target cognitive organs (e.g. `compress`, `governor`, `solve`) are amplified via Grover diffusion operator:
    $$D = 2|\psi\rangle\langle\psi| - I$$
    Query complexity: $\mathcal{O}(\sqrt{N})$ vs classical $\mathcal{O}(N)$.
+
+---
+
+## 6. The 4 Frontier Transcendence Pillars
+
+To transcend the architectural limitations of traditional sandboxes and close the gap against global frontier microVMs and verified kernels, Hyperion integrates:
+
+1. **Native Hypervisor VMM Engine (`engines/native_hypervisor_vmm.py`)**:
+   - Queries hardware virtualization flags directly on physical CPUs (Windows Hypervisor Platform `WinHvPlatform.dll` & Linux `/dev/kvm`).
+   - Dynamically partitions hardware EPT/NPT virtual machine spaces or routes to the native C Silicon Core (`hyperion_silicon_launcher`).
+
+2. **Confidential Computing Attestation & Memory Sealing (`security/confidential_attestation_engine.py`)**:
+   - Computes TPM-style Platform Configuration Register chains (`PCR_0`, `PCR_1`, `PCR_2`) measuring binaries, rules, and environment.
+   - Generates and verifies HMAC-SHA256 signed Attestation Quotes.
+   - Enforces *Zero-Host-Inspection*: memory blocks are sealed using ephemeral cryptographic keystreams preventing host admin snooping.
+
+3. **OCI Container Runtime Specification Shim (`mcp/oci_runtime_shim.py`)**:
+   - Implements the complete OCI runtime specification lifecycle (`create`, `start`, `state`, `delete`).
+   - Accepts standard `bundle/config.json` specifications, enabling drop-in integration with Kubernetes, Docker, and autonomous agent frameworks.
+
+4. **Machine-Checked SMT Verification Engine (`core/formal_invariants_prover.py`)**:
+   - Machine-checks formal safety theorems using Microsoft Z3 SMT:
+     * *Theorem 1 (Monotonicity)*: Escaping to `PROVEN(4)` without satisfying all 3 verification lenses is refutable (`unsat`).
+     * *Theorem 2 (Capability Confinement)*: Forging unauthorized resource tokens is refutable (`unsat`).
+     * *Theorem 3 (Memory Evaporation)*: RAM tmpfs execution commits zero physical host NTFS disk bytes (`unsat`).

@@ -21,6 +21,7 @@ import sys
 import json
 import time
 import argparse
+from pathlib import Path
 from typing import Dict, Any, Optional, List, Set, Tuple
 
 HYPERION_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -65,6 +66,10 @@ from core.sel4_capability_matrix import SeL4CapabilityMatrix, CapRight
 from core.mythos_recurrent_depth import MythosRecurrentDepthEngine
 from core.microvm_session_manager import MicroVMSessionManager
 from silicon_core.silicon_bridge import SiliconBridge
+from engines.native_hypervisor_vmm import NativeHypervisorVMMEngine
+from security.confidential_attestation_engine import ConfidentialAttestationEngine
+from mcp.oci_runtime_shim import OCIRuntimeShim
+from core.formal_invariants_prover import FormalInvariantsProver
 
 
 class TitanHyperionOrchestrator:
@@ -97,6 +102,10 @@ class TitanHyperionOrchestrator:
         self.mythos = MythosRecurrentDepthEngine()
         self.session_manager = MicroVMSessionManager()
         self.silicon_bridge = SiliconBridge()
+        self.vmm = NativeHypervisorVMMEngine()
+        self.attestation = ConfidentialAttestationEngine()
+        self.oci_shim = OCIRuntimeShim()
+        self.formal_prover = FormalInvariantsProver()
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -598,6 +607,27 @@ class TitanHyperionOrchestrator:
         else:
             return {"ok": False, "error": f"Unknown microvm session action: {action}"}
 
+    def query_hypervisor(self) -> Dict[str, Any]:
+        """Queries hardware hypervisor (WHP / KVM) capabilities and status."""
+        return self.vmm.query_hypervisor_capabilities()
+
+    def attest_environment(self, nonce: Optional[str] = None) -> Dict[str, Any]:
+        """Generates a hardware TEE cryptographic attestation quote."""
+        binaries = [
+            Path(HYPERION_ROOT) / "silicon_core" / "hyperion_seccomp_bpf.c",
+            Path(HYPERION_ROOT) / "silicon_core" / "hyperion_mmu_cow_forker.c"
+        ]
+        self.attestation.measure_environment(binaries, {"seccomp": "STRICT_RING0", "landlock": "READONLY"})
+        return self.attestation.generate_attestation_quote(nonce=nonce)
+
+    def prove_formal_invariants(self) -> Dict[str, Any]:
+        """Executes Microsoft Z3 SMT solver to formally prove all security invariants."""
+        return {
+            "theorem_1_soma_monotonicity": self.formal_prover.prove_soma_monotonicity_theorem(),
+            "theorem_2_capability_confinement": self.formal_prover.prove_capability_confinement_theorem(),
+            "theorem_3_zero_disk_mutation": self.formal_prover.prove_zero_disk_mutation_theorem()
+        }
+
     def run_redteam_armor_suite(self, watch_dir: Optional[str] = None) -> Dict[str, Any]:
         """
         Executes 6 adversarial penetration attacks against the sandbox:
@@ -705,6 +735,16 @@ def main():
     sess_p.add_argument("--tag-or-cmd", default=None, help="Checkpoint tag or command to run")
     sess_p.add_argument("--args", nargs="*", default=None, help="Command arguments")
 
+    # Command: hypervisor
+    hyp_p = subparsers.add_parser("hypervisor", help="Query hardware hypervisor status (WHP / KVM)")
+
+    # Command: attestation
+    att_p = subparsers.add_parser("attestation", help="Generate hardware TEE attestation quote")
+    att_p.add_argument("--nonce", default=None, help="Cryptographic nonce")
+
+    # Command: prove
+    prove_p = subparsers.add_parser("prove", help="Formally prove SOMA and capability invariants via Z3 SMT")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -735,6 +775,12 @@ def main():
         res = orch.evaluate_mythos(objective=args.objective)
     elif args.command == "session":
         res = orch.manage_microvm_session(action=args.action, session_id=args.id, tag_or_cmd=args.tag_or_cmd, args=args.args)
+    elif args.command == "hypervisor":
+        res = orch.query_hypervisor()
+    elif args.command == "attestation":
+        res = orch.attest_environment(nonce=args.nonce)
+    elif args.command == "prove":
+        res = orch.prove_formal_invariants()
     elif args.command == "mcp":
         from mcp.hyperion_mcp_server import run_stdio_server
         run_stdio_server()
