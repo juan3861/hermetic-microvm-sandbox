@@ -62,21 +62,37 @@ class SecretSanitizer:
 
     def sanitize(self, text: str) -> str:
         """
-        Scans and redacts all recognized secret patterns from text.
+        Scans and redacts all recognized secret patterns from text using
+        single-pass subn with fast prefix pre-filtering.
         """
         if not text:
             return ""
 
         sanitized = text
         for name, pattern, replacement in self.SECRET_PATTERNS:
-            matches = pattern.findall(sanitized)
-            if matches:
-                self.redaction_count += len(matches)
+            # Fast Boyer-Moore prefix pre-filters to skip unnecessary regex scans
+            if name == "OPENAI_API_KEY" and "sk-" not in sanitized:
+                continue
+            if name == "GITHUB_TOKEN" and not any(p in sanitized for p in ("ghp_", "gho_", "ghu_", "ghs_", "ghr_")):
+                continue
+            if name == "AWS_ACCESS_KEY_ID" and not any(p in sanitized for p in ("AKIA", "ASIA", "ABIA")):
+                continue
+            if name == "JSON_WEB_TOKEN" and "eyJ" not in sanitized:
+                continue
+            if name == "SLACK_TOKEN" and "xox" not in sanitized:
+                continue
+            if name == "PEM_PRIVATE_KEY" and "-----BEGIN" not in sanitized:
+                continue
+            if name == "URL_CREDENTIALS" and "://" not in sanitized:
+                continue
+
+            sanitized, count = pattern.subn(replacement, sanitized)
+            if count > 0:
+                self.redaction_count += count
                 self.audit_log.append({
                     "secret_type": name,
-                    "matches_count": len(matches)
+                    "matches_count": count
                 })
-                sanitized = pattern.sub(replacement, sanitized)
 
         return sanitized
 

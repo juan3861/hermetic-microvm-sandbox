@@ -30,6 +30,16 @@ class FormalInvariantsProver:
     def __init__(self):
         self.z3_available = Z3_AVAILABLE
 
+    def prove_all_theorems(self) -> Dict[str, Any]:
+        """Formally proves all 5 security theorems via Z3 SMT."""
+        return {
+            "theorem_1_soma_monotonicity": self.prove_soma_monotonicity_theorem(),
+            "theorem_2_capability_confinement": self.prove_capability_confinement_theorem(),
+            "theorem_3_zero_disk_mutation": self.prove_zero_disk_mutation_theorem(),
+            "theorem_4_secret_non_exfiltration": self.prove_secret_non_exfiltration_theorem(),
+            "theorem_5_pty_stream_isolation": self.prove_pty_stream_isolation_theorem()
+        }
+
     def prove_soma_monotonicity_theorem(self) -> Dict[str, Any]:
         """
         Theorem 1: Strict Monotonicity of Verification

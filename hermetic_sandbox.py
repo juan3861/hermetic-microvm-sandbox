@@ -20,8 +20,11 @@ from sdk.hermetic_sandbox import (
     ReplayEngine
 )
 
+HermeticSandbox = Sandbox
+
 __all__ = [
     "Sandbox",
+    "HermeticSandbox",
     "Process",
     "CommandResult",
     "SandboxFiles",

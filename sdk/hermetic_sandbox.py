@@ -289,6 +289,9 @@ class Sandbox:
         return f"<HermeticSandbox id='{self.id}' memory_mb={self.memory_mb} status='{status}'>"
 
 
+HermeticSandbox = Sandbox
+
+
 if __name__ == "__main__":
     with Sandbox(memory_mb=256) as sb:
         print("Sandbox iniciada:", sb)
