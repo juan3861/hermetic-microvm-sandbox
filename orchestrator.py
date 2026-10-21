@@ -96,6 +96,8 @@ class TitanHyperionOrchestrator:
         self.attestation = ConfidentialAttestationEngine()
         self.oci_shim = OCIRuntimeShim()
         self._formal_prover = None
+        self._gpu_engine = None
+        self._mesh_swarm = None
 
     @property
     def cloud_engine(self):
@@ -206,6 +208,48 @@ class TitanHyperionOrchestrator:
     @formal_prover.setter
     def formal_prover(self, val):
         self._formal_prover = val
+
+    @property
+    def gpu_engine(self):
+        if self._gpu_engine is None:
+            from engines.silicon_gpu_engine import SiliconGPUEngine
+            self._gpu_engine = SiliconGPUEngine()
+        return self._gpu_engine
+
+    @gpu_engine.setter
+    def gpu_engine(self, val):
+        self._gpu_engine = val
+
+    @property
+    def mesh_swarm(self):
+        if self._mesh_swarm is None:
+            from engines.aether_mesh_swarm import AetherMeshSwarm
+            self._mesh_swarm = AetherMeshSwarm()
+        return self._mesh_swarm
+
+    @mesh_swarm.setter
+    def mesh_swarm(self, val):
+        self._mesh_swarm = val
+
+    def probe_gpu(self) -> Dict[str, Any]:
+        """Probes host and microvm GPU hardware passthrough capabilities."""
+        return self.gpu_engine.probe_gpu_hardware()
+
+    def execute_gpu_tensor(self, code: str, vram_limit_mb: Optional[int] = None) -> Dict[str, Any]:
+        """Executes tensor code with GPU passthrough and VRAM quota enforcement."""
+        return self.gpu_engine.execute_gpu_workload(code=code, vram_limit_mb=vram_limit_mb)
+
+    def query_mesh_swarm(self) -> Dict[str, Any]:
+        """Returns the status and routing table of the P2P AetherMesh swarm."""
+        return self.mesh_swarm.get_mesh_status()
+
+    def dispatch_mesh_job(self, command: str, require_gpu: bool = False) -> Dict[str, Any]:
+        """Dispatches an agent workload across the decentralized P2P mesh network."""
+        return self.mesh_swarm.dispatch_mesh_job(command=command, require_gpu=require_gpu)
+
+    def stream_mesh_snapshot(self, session_id: str, tag: str = "ckpt_mesh") -> Dict[str, Any]:
+        """Streams a live microvm snapshot across nodes with UCIP tensor compression."""
+        return self.mesh_swarm.stream_snapshot_with_ucip(session_id=session_id, checkpoint_tag=tag)
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -851,6 +895,19 @@ def main():
     oci_p.add_argument("--id", required=True, help="Container ID")
     oci_p.add_argument("--bundle", default=None, help="Bundle directory containing config.json")
 
+    # Command: gpu (Hardware GPU Passthrough & VRAM Quotas)
+    gpu_p = subparsers.add_parser("gpu", help="Hardware GPU passthrough & VRAM confinement")
+    gpu_p.add_argument("--action", choices=["probe", "run"], required=True)
+    gpu_p.add_argument("--code", default="print('GPU_TENSOR_ACTIVE')", help="Code string to execute with GPU")
+    gpu_p.add_argument("--vram-mb", type=int, default=4096, help="VRAM ceiling in MB")
+
+    # Command: mesh (AetherMesh P2P Distributed Swarm)
+    mesh_p = subparsers.add_parser("mesh", help="Decentralized P2P MicroVM mesh swarm")
+    mesh_p.add_argument("--action", choices=["status", "dispatch", "stream"], required=True)
+    mesh_p.add_argument("--cmd", default="echo 'MESH_JOB_OK'", help="Command to dispatch across mesh")
+    mesh_p.add_argument("--session-id", default="sess_mesh_live", help="Session ID for snapshot streaming")
+    mesh_p.add_argument("--gpu", action="store_true", help="Require GPU node for dispatch")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -899,6 +956,18 @@ def main():
             elif act == "delete":
                 ok = orch.oci_shim.delete_container(args.id)
                 res = {"ok": ok, "id": args.id}
+        elif args.command == "gpu":
+            if args.action == "probe":
+                res = orch.probe_gpu()
+            elif args.action == "run":
+                res = orch.execute_gpu_tensor(code=args.code, vram_limit_mb=args.vram_mb)
+        elif args.command == "mesh":
+            if args.action == "status":
+                res = orch.query_mesh_swarm()
+            elif args.action == "dispatch":
+                res = orch.dispatch_mesh_job(command=args.cmd, require_gpu=args.gpu)
+            elif args.action == "stream":
+                res = orch.stream_mesh_snapshot(session_id=args.session_id)
         elif args.command == "mcp":
             from mcp.hyperion_mcp_server import run_stdio_server
             run_stdio_server()
