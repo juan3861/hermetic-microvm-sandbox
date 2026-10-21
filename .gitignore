@@ -46,6 +46,7 @@ Thumbs.db
 # Dynamic Run Artifacts
 *.log
 hyperion_latest_proof.json
+.hyperion_sessions.json
 silicon_core/hyperion_seccomp_bpf
 silicon_core/hyperion_mmu_cow_forker
 silicon_core/hyperion_silicon_launcher

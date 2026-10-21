@@ -29,7 +29,7 @@ class TimeTravelEngine:
         self.wsl_distro = wsl_distro
         self.active_checkpoints: Dict[str, Dict[str, Any]] = {}
 
-    def _run_wsl(self, cmd: str, timeout: int = 15) -> subprocess.CompletedProcess:
+    def _run_wsl(self, cmd: str, timeout: int = 45) -> subprocess.CompletedProcess:
         creationflags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         return subprocess.run(
             ["wsl", "-d", self.wsl_distro, "bash", "-c", cmd],

@@ -73,7 +73,11 @@ class GVisorSentryGuard:
                     if forbidden in func_name.lower():
                         violations.append(f"FORBIDDEN_SYSCALL_INVOCATION: {forbidden}")
 
-        # Check raw strings for cloud metadata exfiltration
+        # Check raw strings for forbidden syscalls or cloud metadata exfiltration
+        for syscall in self.FORBIDDEN_SYSCALLS:
+            if re.search(rf"\b{syscall}\b", source_code):
+                violations.append(f"FORBIDDEN_SYSCALL_INVOCATION: {syscall}")
+
         for target in self.RESTRICTED_NETWORK_TARGETS:
             if target in source_code:
                 violations.append(f"RESTRICTED_NETWORK_TARGET_DETECTED: {target}")

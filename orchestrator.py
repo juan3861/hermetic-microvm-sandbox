@@ -62,6 +62,9 @@ from engines.landlock_crun_engine import LandlockCrunEngine
 from engines.wasm_runtime_engine import WasmRuntimeEngine
 from security.behavioral_ebpf_monitor import BehavioralEBPFMonitor
 from core.sel4_capability_matrix import SeL4CapabilityMatrix, CapRight
+from core.mythos_recurrent_depth import MythosRecurrentDepthEngine
+from core.microvm_session_manager import MicroVMSessionManager
+from silicon_core.silicon_bridge import SiliconBridge
 
 
 class TitanHyperionOrchestrator:
@@ -91,6 +94,9 @@ class TitanHyperionOrchestrator:
         self.wasm_engine = WasmRuntimeEngine()
         self.ebpf_monitor = BehavioralEBPFMonitor()
         self.sel4_caps = SeL4CapabilityMatrix()
+        self.mythos = MythosRecurrentDepthEngine()
+        self.session_manager = MicroVMSessionManager()
+        self.silicon_bridge = SiliconBridge()
 
     def _run_repository_compiler_v2_pipeline(self, sample_code: str, doc_id: str = "hyperion_capsule") -> Dict[str, Any]:
         """
@@ -505,13 +511,92 @@ class TitanHyperionOrchestrator:
         self,
         code: str,
         language: Optional[str] = None,
-        timeout_sec: int = 45
+        timeout_sec: int = 45,
+        cap_token: Optional[str] = None
     ) -> Dict[str, Any]:
         """
-        Executes code in Python, Node.js/JavaScript, C/C++, or Bash inside
-        an airgapped, zero-wear DDR RAM sandbox (/dev/shm) under bwrap --unshare-all.
+        Executes code inside an airgapped, zero-wear DDR RAM sandbox under
+        seL4 capability check, gVisor Sentry policy, and Silicon Core / bwrap isolation.
         """
-        return self.polyglot_jail.execute_code(code=code, language=language, timeout_sec=timeout_sec)
+        lang = language or self.polyglot_jail.detect_language(code)
+
+        # 1. seL4 Capability-Based Access Control verification
+        subject_id = "agent_executor"
+        if cap_token:
+            is_valid = self.sel4_caps.verify_capability(cap_token, CapRight.EXECUTE, "/dev/shm")
+            if not is_valid:
+                return {"ok": False, "error": "DENIED_BY_SEL4_CAPABILITY_MATRIX", "returncode": 13}
+        else:
+            cap = self.sel4_caps.mint_capability(subject_id, "/dev/shm", CapRight.READ | CapRight.WRITE | CapRight.EXECUTE)
+            cap_token = cap["token_string"]
+
+        # 2. gVisor Sentry Syscall Interceptor
+        sentry_res = self.sentry_guard.enforce_sentry_policy(code, lang)
+        if sentry_res["sentry_verdict"] == "DENIED_BY_SENTRY_POLICY":
+            self.ebpf_monitor.record_trace_event(
+                event_type="BPF_PROBE_SYSCALL",
+                pid=os.getpid(),
+                target=sentry_res.get("rule_violated", "prohibited_syscall"),
+                action="DENY",
+                status="BLOCKED_BY_SENTRY",
+                metadata={"code_snippet": code[:64]}
+            )
+            return {
+                "ok": False,
+                "error": "DENIED_BY_SENTRY_POLICY",
+                "sentry_audit": sentry_res,
+                "returncode": 1
+            }
+
+        # 3. eBPF Telemetry Recording
+        self.ebpf_monitor.record_trace_event(
+            event_type="BPF_PROBE_EXEC",
+            pid=os.getpid(),
+            target=f"polyglot_{lang}",
+            action="execve",
+            status="ALLOW",
+            metadata={"code_len": len(code)}
+        )
+
+        # 4. Dispatch via Polyglot Jail
+        exec_res = self.polyglot_jail.execute_code(code=code, language=lang, timeout_sec=timeout_sec)
+        exec_res["sel4_capability_token"] = cap_token[:16] + "..."
+        exec_res["sentry_audit_ok"] = True
+        return exec_res
+
+    def evaluate_mythos(self, objective: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Applies Anthropic Mythos 3-pass recurrent depth synthesis and UltraPlan mapping.
+        """
+        return self.mythos.recurrent_depth_evaluate(objective, context or {})
+
+    def manage_microvm_session(
+        self,
+        action: str,
+        session_id: str,
+        tag_or_cmd: Optional[str] = None,
+        args: Optional[List[str]] = None
+    ) -> Dict[str, Any]:
+        """
+        Manages stateful E2B/Firecracker microvm sessions (create, checkpoint, run, rollback, terminate).
+        """
+        act = action.lower()
+        if act == "create":
+            sess = self.session_manager.create_session(session_id)
+            return {"ok": True, "action": "SESSION_CREATED", "session": sess.to_dict()}
+        elif act == "checkpoint":
+            res = self.session_manager.checkpoint(session_id, tag_or_cmd or "ckpt_default")
+            return res
+        elif act == "run":
+            cmd = tag_or_cmd or "echo"
+            return self.session_manager.run_in_session(session_id, cmd, args or [])
+        elif act == "rollback":
+            return self.session_manager.rollback(session_id, tag_or_cmd or "ckpt_default")
+        elif act == "terminate":
+            ok = self.session_manager.terminate_session(session_id)
+            return {"ok": ok, "action": "SESSION_TERMINATED", "session_id": session_id}
+        else:
+            return {"ok": False, "error": f"Unknown microvm session action: {action}"}
 
     def run_redteam_armor_suite(self, watch_dir: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -609,6 +694,17 @@ def main():
     # Command: mcp (Model Context Protocol server)
     mcp_p = subparsers.add_parser("mcp", help="Run standard Model Context Protocol (MCP) stdio server")
 
+    # Command: mythos (Anthropic Mythos 3-pass recurrent depth)
+    mythos_p = subparsers.add_parser("mythos", help="Run Mythos 3-pass recurrent depth synthesis")
+    mythos_p.add_argument("--objective", required=True, help="Target objective to analyze")
+
+    # Command: session (MicroVM stateful session management)
+    sess_p = subparsers.add_parser("session", help="Manage MicroVM interactive sessions")
+    sess_p.add_argument("--action", choices=["create", "checkpoint", "run", "rollback", "terminate"], required=True)
+    sess_p.add_argument("--id", required=True, help="Session ID")
+    sess_p.add_argument("--tag-or-cmd", default=None, help="Checkpoint tag or command to run")
+    sess_p.add_argument("--args", nargs="*", default=None, help="Command arguments")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -635,6 +731,10 @@ def main():
         res = orch.audit_sentry_guard(code=args.code, language=args.lang)
     elif args.command == "wasm":
         res = orch.execute_wasm(wat_or_wasm_hex="HEX:DEFAULT_ADD", export_func_name=args.func, func_args=args.args)
+    elif args.command == "mythos":
+        res = orch.evaluate_mythos(objective=args.objective)
+    elif args.command == "session":
+        res = orch.manage_microvm_session(action=args.action, session_id=args.id, tag_or_cmd=args.tag_or_cmd, args=args.args)
     elif args.command == "mcp":
         from mcp.hyperion_mcp_server import run_stdio_server
         run_stdio_server()

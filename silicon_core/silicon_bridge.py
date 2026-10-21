@@ -35,7 +35,7 @@ class SiliconBridge:
             return f"/mnt/{drive}{s[2:]}"
         return s
 
-    def _run_linux_command(self, cmd_args: List[str], timeout: float = 15.0) -> subprocess.CompletedProcess:
+    def _run_linux_command(self, cmd_args: List[str], timeout: float = 30.0) -> subprocess.CompletedProcess:
         """Executes a command directly or via WSL2 when running on Windows."""
         if self.is_windows:
             full_cmd = ["wsl", "-d", "Ubuntu"] + cmd_args

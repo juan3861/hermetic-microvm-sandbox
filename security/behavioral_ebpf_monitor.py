@@ -96,5 +96,11 @@ class BehavioralEBPFMonitor:
             "security_grade": "A+" if is_clean else "C"
         }
 
+    def drain_events(self) -> List[Dict[str, Any]]:
+        """Drains and returns all recorded trace events from the ring buffer."""
+        events = list(self.recorded_events)
+        self.recorded_events.clear()
+        return events
+
     def clear(self) -> None:
         self.recorded_events.clear()
