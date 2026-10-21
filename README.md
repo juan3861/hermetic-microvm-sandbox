@@ -173,22 +173,27 @@ Hyperion operates at the physical silicon boundary via three compiled C engines 
 
 ## 🐍 Universal Agent SDK (E2B / OpenHands Drop-In Replacement)
 
-The `hermetic-microvm-sandbox` SDK provides a 100% drop-in replacement for **E2B** and **OpenHands**, delivering microsecond execution backed by volatile DDR RAM with zero cloud fees:
+The `hermetic-microvm-sandbox` SDK provides a 100% drop-in replacement for **E2B** and **OpenHands**, delivering microsecond execution backed by volatile DDR RAM, active credential redaction, and real-time streaming chunks:
 
 ```python
-from sdk.hermetic_sandbox import Sandbox
+from hermetic_sandbox import Sandbox, StreamChunk
 
-# Zero-wear volatile DDR RAM sandbox
+# Zero-wear volatile DDR RAM sandbox with active secret sanitization
 with Sandbox(memory_mb=512) as sb:
-    # In-memory filesystem
-    sb.files.write("agent_task.py", "print('Executed via Hermetic Silicon Core!')")
-    print(sb.files.read("agent_task.py"))
+    # 1. Stateful Code Execution (retains variables, functions, and imports)
+    sb.run_code("x = 42\ndef compute(): return x * 2")
+    res = sb.run_code("compute()")
+    print("Result:", res.result)  # 84
 
-    # Command execution
-    res = sb.commands.run("python3 agent_task.py")
-    print("Agent Output:", res.stdout)
+    # 2. Real-Time Streaming Chunks (stdout, stderr, result)
+    for chunk in sb.run_code_stream("for i in range(3): print(f'Step {i}')\n100"):
+        print(f"[{chunk.channel}] {chunk.text.strip()}")
 
-    # Microsecond snapshotting & instant rollback
+    # 3. Active Secret Sanitization (TruffleHog/GitGuardian entropy shield)
+    leak_test = sb.run_code("print('LEAK: sk-proj-1234567890abcdef1234567890')")
+    print("Sanitized Output:", leak_test.stdout)  # sk-***[REDACTED_OPENAI_KEY]***
+
+    # 4. Microsecond snapshotting & instant rollback
     sb.take_snapshot("ckpt_before_edit")
     # ... if agent mutates workspace ...
     sb.restore_snapshot("ckpt_before_edit")

@@ -1,26 +1,23 @@
-# COMPONENT REUSE MANIFEST: SELEÇÃO E ADAPTAÇÃO MODULAR
-
-## 1. Componentes Aprovados para Integração
-
-| Componente | Repositório / Fonte de Inspiração | Licença | Estratégia de Encaixe | Módulo Destino |
-|---|---|---|---|---|
-| **OCI Layer Unpacker & Whiteout Merger** | `opencontainers/umoci` & OCI Image Spec v1.1 | Apache-2.0 | **Adapter/Bridge Pattern** (Python Standard `tarfile` + `hashlib` em `/dev/shm`) | `mcp/oci_image_unpacker.py` |
-| **MicroVM Fault-Tolerant Watchdog** | `vhive-serverless/vHive` & Firecracker Snapshots | Apache-2.0 | **Native API Integration** (Hook no `MicroVMSessionManager` com captura de sinais) | `core/fault_tolerant_watchdog.py` |
-| **Adversarial Syscall & Stress Fuzzer** | `google/syzkaller` & Linux seccomp-tests | Apache-2.0 | **Plug-and-play Verification Module** (Testa `GVisorSentryGuard` e `SiliconBridge`) | `security/adversarial_syscall_fuzzer.py` |
+# COMPONENT REUSE MANIFEST — MASTER PROMPT V2
+**System:** Hermetic MicroVM Sandbox v2.3.0  
+**Timestamp:** 2026-10-21T16:51:00-03:00  
 
 ---
 
-## 2. Critérios de Aceitação por Componente
+## 1. Relação de Peças Selecionadas e Estratégia de Encaixe
 
-1. **`mcp/oci_image_unpacker.py`**:
-   - Criação de bundle OCI válido com `config.json` e `rootfs/`.
-   - Extração de camadas tar.gz com resolução correta de hashes SHA-256 de blobs.
-   - Tratamento de whiteouts (`.wh.<file>`) para remoção de arquivos criados em camadas inferiores.
-   - Extração 100% contida em DDR RAM (`/dev/shm`) sem permissão de root.
-2. **`core/fault_tolerant_watchdog.py`**:
-   - Detecção em tempo real de crash de processo (`returncode in (137, 139, 124)`).
-   - Acionamento automático de rollback para o checkpoint limpo em $< 5\text{ ms}$.
-   - Retorno de telemetria com diagnóstico de causa raiz (OOM, Segfault, CPU Hang).
-3. **`security/adversarial_syscall_fuzzer.py`**:
-   - Execução de bateria com 100 variações de payloads adversariais e chamadas de sistema proibidas.
-   - Taxa de contenção de 100% (`blocked_count == 100`).
+1. **`security/secret_sanitizer.py` (SecretSanitizer)**:
+   - **Origem:** Padrões TruffleHog / GitGuardian adaptados para streaming em Python.
+   - **Estratégia de Integração:** Wrapper / Filter aplicado automaticamente a saídas de shell e do interpretador REPL.
+   - **Licença:** Apache 2.0 compatível.
+   - **Critério de Aceitação:** Interceptar e mascarar chaves OpenAI (`sk-...`), GitHub (`ghp_...`), AWS (`AKIA...`), Slack tokens, e chaves privadas RSA/EC sem corromper texto legítimo.
+
+2. **`sdk/hermetic_sandbox.py` (Streaming Execution Conduit)**:
+   - **Origem:** E2B / OpenHands streaming generator protocol.
+   - **Estratégia de Integração:** Drop-in extension na classe `Sandbox`.
+   - **Critério de Aceitação:** `sandbox.run_code_stream()` emite objetos `StreamChunk` de forma contínua durante a execução.
+
+3. **`tests/test_mutation_and_invariants.py` (Adversarial Mutation & Invariant Suite)**:
+   - **Origem:** Princípios Mutmut / Metamorphic Testing.
+   - **Estratégia de Integração:** Suíte de teste independente adicionada ao diretório `tests/`.
+   - **Critério de Aceitação:** 100% dos mutantes artificiais injetados em filtros de segurança devem ser mortos (detectados e rejeitados) pelos testes.

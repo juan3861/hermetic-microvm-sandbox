@@ -1,41 +1,29 @@
-# EXECUTION ROADMAP: DUAL-AGENT AUTONOMOUS ENGINEERING
+# EXECUTION ROADMAP & DAG — MASTER PROMPT V2
+**System:** Hermetic MicroVM Sandbox v2.3.0  
+**Timestamp:** 2026-10-21T16:51:00-03:00  
 
-## Directed Acyclic Graph (DAG) das Tarefas de Integração
+---
+
+## 1. Directed Acyclic Graph (DAG) de Implementação
 
 ```mermaid
-graph TD
-    T1["Tarefa 1: OCI Image Unpacker Nativo (mcp/oci_image_unpacker.py)"]
-    T2["Tarefa 2: Fault-Tolerant MicroVM Self-Recovery Watchdog (core/fault_tolerant_watchdog.py)"]
-    T3["Tarefa 3: Adversarial Syscall Fuzzer Engine (security/adversarial_syscall_fuzzer.py)"]
-    T4["Tarefa 4: Conexão dos Módulos no TitanHyperionOrchestrator e CLI hermetic.cmd"]
-    T5["Tarefa 5: Execução da Bateria de Testes Unitários e Integrados (15 Suítes)"]
-    T6["Tarefa 6: Auditoria Adversarial Independente (Agente 2 - Zero Trust Review)"]
-    T7["Tarefa 7: Emissão da Decisão de Auditoria e Sincronização Git Remota"]
-
-    T1 --> T4
-    T2 --> T4
-    T3 --> T4
-    T4 --> T5
-    T5 --> T6
-    T6 --> T7
+flowchart TD
+    T0["Freeze Acceptance Contract (ACCEPTANCE_CONTRACT.md)"] --> T1["Implement SecretSanitizer (security/secret_sanitizer.py)"]
+    T1 --> T2["Integrate Secret Sanitizer in REPL & Sandbox SDK"]
+    T0 --> T3["Implement Streaming Generator (sdk/hermetic_sandbox.py)"]
+    T2 & T3 --> T4["Update orchestrator.py CLI & Telemetry"]
+    T4 --> T5["Build Mutation & Invariant Test Suite (test_mutation_and_invariants.py)"]
+    T5 --> T6["Build Secret Sanitizer Test Suite (test_secret_sanitizer.py)"]
+    T6 --> T7["Batch Regression Test (All 21 Suites)"]
+    T7 --> T8["Strict Auditor Certification (AetherMind_Strict_Auditor.py)"]
+    T8 --> T9["Independent Adversarial Audit by Subagent"]
+    T9 --> T10["Final Acceptance, Commit & Push"]
 ```
 
 ---
 
-## Detalhamento das Tarefas de Implementação
-
-1. **Tarefa 1: OCI Image Unpacker Nativo**
-   - *Arquivo*: `mcp/oci_image_unpacker.py`
-   - *Alvo*: Descompactar e mesclar camadas OCI Image v1.1 em `/dev/shm` com zero-daemon.
-2. **Tarefa 2: Fault-Tolerant Watchdog**
-   - *Arquivo*: `core/fault_tolerant_watchdog.py`
-   - *Alvo*: Monitorar processos do agente, interceptar SIGSEGV/OOM e reverter a microVM para estado íntegro em milissegundos.
-3. **Tarefa 3: Adversarial Syscall Fuzzer**
-   - *Arquivo*: `security/adversarial_syscall_fuzzer.py`
-   - *Alvo*: Gerar 100 ataques de syscall maliciosas e validar 100% de neutralização pelo gVisor Sentry e Seccomp-BPF.
-4. **Tarefa 4: Integração no Orquestrador**
-   - *Arquivo*: `orchestrator.py`
-   - *Alvo*: Adicionar comandos CLI `oci-unpack`, `watchdog` e `fuzz`.
-5. **Tarefa 5 & 6: Testes e Auditoria Adversarial Independente**
-   - *Arquivos*: `tests/test_oci_image_unpacker.py`, `tests/test_fault_tolerant_watchdog.py`, `tests/test_adversarial_syscall_fuzzer.py`
-   - *Alvo*: Aprovação no `AetherMind_Strict_Auditor.py` com pontuação $\ge 95/100$.
+## 2. Caminho Crítico e Priorização
+- **P0 (Crítico):** `security/secret_sanitizer.py` (Prevenção de vazamento de credenciais).
+- **P1 (Funcional):** Streaming generator em `sdk/hermetic_sandbox.py`.
+- **P2 (Adversarial):** Bateria de testes de mutação e invariantes.
+- **P3 (Auditoria):** Execução independente pelo subagente e veredito do auditor.

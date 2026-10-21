@@ -18,6 +18,8 @@ import traceback
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Union
 
+from security.secret_sanitizer import SecretSanitizer
+
 
 class REPLExecutionResult:
     """Represents the rich outcome of an interactive stateful code execution."""
@@ -80,6 +82,7 @@ class StatefulREPLEngine:
         }
         self.execution_counter: int = 0
         self.history: List[Dict[str, Any]] = []
+        self.sanitizer = SecretSanitizer()
 
     def execute_code(self, code: str, timeout_sec: int = 30) -> REPLExecutionResult:
         """
@@ -131,9 +134,16 @@ class StatefulREPLEngine:
 
         elapsed_ms = round((time.perf_counter() - t0) * 1000, 3)
 
+        raw_stdout = stdout_buf.getvalue()
+        raw_stderr = stderr_buf.getvalue()
+        clean_stdout = self.sanitizer.sanitize(raw_stdout)
+        clean_stderr = self.sanitizer.sanitize(raw_stderr)
+        if isinstance(eval_result, str):
+            eval_result = self.sanitizer.sanitize(eval_result)
+
         out_res = REPLExecutionResult(
-            stdout=stdout_buf.getvalue(),
-            stderr=stderr_buf.getvalue(),
+            stdout=clean_stdout,
+            stderr=clean_stderr,
             result=eval_result,
             error=error_msg,
             elapsed_ms=elapsed_ms,

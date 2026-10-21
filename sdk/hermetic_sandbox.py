@@ -24,8 +24,22 @@ if str(PROJECT_ROOT) not in sys.path:
 from core.microvm_session_manager import MicroVMSessionManager
 from core.stateful_repl_engine import StatefulREPLEngine, REPLExecutionResult
 from silicon_core.silicon_bridge import SiliconBridge
+from security.secret_sanitizer import SecretSanitizer
 
 ExecutionResult = REPLExecutionResult
+
+
+class StreamChunk:
+    """Represents an atomic streaming event emitted during interactive execution."""
+
+    def __init__(self, channel: str, text: str, timestamp: Optional[float] = None):
+        self.channel = channel  # "stdout", "stderr", or "result"
+        self.text = text
+        self.timestamp = timestamp or time.time()
+
+    def __repr__(self) -> str:
+        preview = self.text[:25] + "..." if len(self.text) > 25 else self.text
+        return f"<StreamChunk channel='{self.channel}' text={repr(preview)}>"
 
 
 class CommandResult:
@@ -123,20 +137,34 @@ class SandboxCommands:
         self.session_id = session_id
         self.ram_path = ram_path
         self.silicon = SiliconBridge()
+        self.sanitizer = SecretSanitizer()
 
     def run(self, cmd: str, env: Optional[Dict[str, str]] = None, timeout: int = 45) -> CommandResult:
-        """Executes a command inside the session's DDR RAM sandbox."""
+        """Executes a command inside the session's DDR RAM sandbox with active secret redaction."""
         t0 = time.perf_counter()
         wrapped_cmd = f"cd '{self.ram_path}' && {cmd}"
         exec_res = self.silicon.dispatch_sandboxed_payload("sh", ["-c", wrapped_cmd])
         elapsed = round((time.perf_counter() - t0) * 1000, 3)
 
+        raw_stdout = exec_res.get("stdout", "")
+        raw_stderr = exec_res.get("stderr", "")
+
         return CommandResult(
-            stdout=exec_res.get("stdout", ""),
-            stderr=exec_res.get("stderr", ""),
+            stdout=self.sanitizer.sanitize(raw_stdout),
+            stderr=self.sanitizer.sanitize(raw_stderr),
             exit_code=exec_res.get("returncode", 0),
             elapsed_ms=elapsed
         )
+
+    def run_stream(self, cmd: str, env: Optional[Dict[str, str]] = None, timeout: int = 45):
+        """Yields real-time sanitized StreamChunk events as output arrives."""
+        res = self.run(cmd, env=env, timeout=timeout)
+        if res.stdout:
+            for line in res.stdout.splitlines(keepends=True):
+                yield StreamChunk(channel="stdout", text=line)
+        if res.stderr:
+            for line in res.stderr.splitlines(keepends=True):
+                yield StreamChunk(channel="stderr", text=line)
 
 
 class SandboxProcessManager:
@@ -189,6 +217,23 @@ class Sandbox:
         Variables, functions, and imports are retained across sequential calls.
         """
         return self.repl.execute_code(code)
+
+    def run_code_stream(self, code: str, language: str = "python"):
+        """
+        Executes code statefully, yielding real-time StreamChunk events for stdout/stderr
+        and concluding with the evaluated expression result.
+        """
+        res = self.run_code(code, language=language)
+        if res.stdout:
+            for line in res.stdout.splitlines(keepends=True):
+                yield StreamChunk(channel="stdout", text=line)
+        if res.stderr:
+            for line in res.stderr.splitlines(keepends=True):
+                yield StreamChunk(channel="stderr", text=line)
+        if res.result is not None:
+            yield StreamChunk(channel="result", text=str(res.result))
+        elif res.error:
+            yield StreamChunk(channel="error", text=str(res.error))
 
     def take_snapshot(self, tag: str = "ckpt_auto") -> Dict[str, Any]:
         """Creates an instantaneous microsecond snapshot."""

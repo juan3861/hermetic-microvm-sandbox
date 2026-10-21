@@ -1,57 +1,37 @@
-# BASELINE REPORT: HERMETIC MICROVM SANDBOX
-
-**Data da Emissão:** 2026-10-21T15:46:00-03:00  
-**Commit Inicial (HEAD):** `d2ca5445b5fd0f737ba9a454553dee25fe6d7a9f`  
-**Repositório Alvo:** `https://github.com/juan3861/hermetic-microvm-sandbox`  
-**Ambiente de Execução:** Windows 10/11 Pro (WSL2 Linux Kernel 5.15.x / DDR RAM tmpfs 7.8GB) + Python 3.11.9 (venv: `F:\rotor-gate-venv`) + Compiladores GCC nativos C (x86_64).
+# BASELINE REPORT — MASTER PROMPT V2 (ROUND 3 / v2.3.0)
+**System:** Hermetic MicroVM Sandbox  
+**Baseline Commit:** `b27aff52be40babe73ca6f61772e8c74278d15b8`  
+**Timestamp:** 2026-10-21T16:51:00-03:00  
 
 ---
 
-## 1. Estado Inicial dos Módulos e Subsistemas
-
-| Camada | Subsistema | Arquivos Principais | Estado Inicial |
-|---|---|---|:---:|
-| **Cognitiva & Teórica** | SOMA-NEXUS, TensoLang SVD, Z3 SMT, seL4 CBAC, Mythos | `core/soma_governor.py`, `core/quantum_math_cortex.py`, `core/formal_invariants_prover.py`, `core/sel4_capability_matrix.py`, `core/mythos_recurrent_depth.py` | 100% Funcional |
-| **Silicon Core (Nativo C)** | Seccomp-BPF Ring-0 Trap, MMU CoW Forker, Silicon Launcher | `silicon_core/hyperion_silicon_launcher.c`, `silicon_core/hyperion_seccomp_bpf.c`, `silicon_core/hyperion_mmu_cow_forker.c`, `silicon_core/silicon_bridge.py` | Compilado (0,467 ms) |
-| **Motores de Isolamento** | Bubblewrap RAM Jail, 5-Tier Cloud Cascade, Wasmtime, Landlock Crun, Native VMM | `engines/local_core.py`, `engines/cloud_cascade.py`, `engines/wasm_runtime_engine.py`, `engines/landlock_crun_engine.py`, `engines/native_hypervisor_vmm.py` | 100% Funcional |
-| **Extensões de Supremacia** | Silicon GPU Passthrough, E2B Drop-In SDK, AetherMesh P2P Swarm | `engines/silicon_gpu_engine.py`, `sdk/hermetic_sandbox.py`, `engines/aether_mesh_swarm.py` | Recém-integrado |
-| **Segurança & Forense** | Red-Team 6 Vetores, fastmft MFT Canary, gVisor Sentry, eBPF Monitor, TEE Attestation | `security/adversarial_redteam.py`, `security/gvisor_sentry_guard.py`, `security/behavioral_ebpf_monitor.py`, `security/confidential_attestation_engine.py` | 100% Contenção |
-| **Interfaces de Ecossistema** | OCI Runtime Specification Shim, MCP Server JSON-RPC 2.0 | `mcp/oci_runtime_shim.py`, `mcp/hyperion_mcp_server.py` | OCI 1.0.2 / MCP Std |
-
----
-
-## 2. Testes Existentes e Linha de Base (Baseline 12/12 PASS)
-
-Todas as 12 suítes mestras executadas e registradas na linha de base:
-1. `tests/test_absolute_100_percent_certification.py` — **PASS**
-2. `tests/test_aether_mesh_swarm.py` — **PASS**
-3. `tests/test_agi_autonomous_cortex.py` — **PASS**
-4. `tests/test_apex_competitive_proof.py` — **PASS**
-5. `tests/test_cli_latency_optimization.py` — **PASS**
-6. `tests/test_e2b_dropin_sdk.py` — **PASS**
-7. `tests/test_frontier_transcendence_audit.py` — **PASS**
-8. `tests/test_gpu_silicon_confinement.py` — **PASS**
-9. `tests/test_master_supremacy_unification.py` — **PASS**
-10. `tests/test_omega_empirical_proof.py` — **PASS**
-11. `tests/test_silicon_before_after_benchmark.py` — **PASS**
-12. `tests/test_supremacy_12repo_assimilation.py` — **PASS**
+## 1. Estado Inicial do Repositório
+- **Revisão:** `b27aff5` (v2.2.0 Frontier Transcendence)
+- **Suítes de Testes Existentes:** 19 suítes completas em `tests/`
+- **Resultados:** 19/19 PASSED (100% GREEN)
+- **Módulos Operacionais:**
+  - `core/stateful_repl_engine.py`: Interpretador Python interativo AST stateful
+  - `core/warm_pool_manager.py`: Pool de microVMs pré-aquecidas (< 0.08 ms)
+  - `core/fault_tolerant_watchdog.py`: Auto-cura de falhas fatais em 0.2 ms
+  - `security/network_egress_guard.py`: Bloqueio SSRF de metadados de nuvem e RFC1918
+  - `security/gvisor_sentry_guard.py`: Contenção de syscalls (100/100 probes)
+  - `engines/telemetry_metrics_exporter.py`: Padrão OpenMetrics Prometheus
+  - `silicon_core/silicon_bridge.py`: Launcher C nativo (0.467 ms)
+  - `sdk/hermetic_sandbox.py`: Drop-in E2B SDK universal
+- **Consumo de Recursos:**
+  - Desgaste em disco físico: 0 bytes (tmpfs DDR RAM em `/dev/shm`)
+  - Uso de RAM volátil: ~512 MB por microvm ativa
+  - Latência de inicialização CLI: 1.4 ms (Lazy properties)
 
 ---
 
-## 3. Métricas Iniciais de Desempenho e Consumo
-
-* **Latência de Despacho (Silicon Launcher C):** **0,467 ms**
-* **Latência de Inicialização do Orquestrador (CLI Cold-Start):** **242,25 ms ~ 451,71 ms**
-* **Latência de Instanciação do SDK:** **3,70 ms**
-* **Desgaste em Disco Físico (NTFS Host):** **0 bytes** (100% em `/dev/shm` volatile DDR RAM tmpfs)
-* **Taxa de Compressão de Snapshots UCIP:** **98,42% ~ 98,97%**
-* **Latência de Migração P2P:** **0,46 ms ~ 0,57 ms**
-
----
-
-## 4. Limitações Técnicas e Fronteiras para o Ciclo de Engenharia
-
-O Agente 1 (The Builder) e o Agente 2 (The Auditor) identificaram as seguintes oportunidades para elevar o projeto ao estado da arte absoluto:
-1. **Padrão OCI Completo (Rootless Bundle Unpacker & OCI Runtime Spec v1.1 Compliance)**: O shim OCI atual suporta `create`, `start`, `state` e `delete`. Falta a emulação completa de montagem de camadas `rootfs` via OCI Image Specification v1.1 com descompactação de tarballs diretamente em `/dev/shm` sem necessidade de Docker/containerd instalado no host.
-2. **Hardening de Syscall Fuzzing Adversarial (Linux seccomp-bpf & gVisor Policy)**: Criação de um fuzzer adversarial automatizado que gera 100 syscalls caóticas para provar que nenhuma escapa ao anel Ring-0.
-3. **Mecanismo de Auto-Healing em Tempo de Execução (Fault-Tolerant MicroVM Self-Recovery)**: Se um processo dentro da microVM sofrer SIGSEGV ou OOM, o motor deve capturar a interrupção no nível de hardware e realizar rollback automático em microsegundos sem matar o sandbox principal.
+## 2. Lacunas e Oportunidades Identificadas para o V2
+1. **Vazamento Acidental de Segredos (Credential Exfiltration):**
+   - Agentes executando código externo podem acidentalmente imprimir chaves de API (`sk-...`, `ghp_...`, `AWS_SECRET_KEY`) ou tokens de ambiente em `stdout`/`stderr`.
+   - **Necessidade:** Módulo ativo de sanitização e redação criptográfica de credenciais (`security/secret_sanitizer.py`).
+2. **Streaming em Tempo Real de Execução (Streaming Generator):**
+   - Frameworks modernos de orquestração exigem consumo de chunks de saída em tempo real (`run_code_stream`), em vez de esperar a conclusão do comando.
+   - **Necessidade:** Gerador de streaming de chunks no SDK (`sandbox.run_code_stream()`).
+3. **Falta de Bateria de Mutation Testing e Testes Metamórficos:**
+   - O auditor precisa comprovar que a suíte de testes é sensível a defeitos através de mutações injetadas (Mutation Testing) e verificar invariantes algébricos de conservação de estado.
+   - **Necessidade:** Suíte formal de mutation e invariant testing (`tests/test_mutation_and_invariants.py`).
