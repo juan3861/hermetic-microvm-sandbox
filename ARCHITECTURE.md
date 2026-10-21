@@ -119,7 +119,9 @@ To transcend the architectural limitations of traditional sandboxes and close th
    - Accepts standard `bundle/config.json` specifications, enabling drop-in integration with Kubernetes, Docker, and autonomous agent frameworks.
 
 4. **Machine-Checked SMT Verification Engine (`core/formal_invariants_prover.py`)**:
-   - Machine-checks formal safety theorems using Microsoft Z3 SMT:
+   - Machine-checks 5 formal safety theorems using Microsoft Z3 SMT:
      * *Theorem 1 (Monotonicity)*: Escaping to `PROVEN(4)` without satisfying all 3 verification lenses is refutable (`unsat`).
      * *Theorem 2 (Capability Confinement)*: Forging unauthorized resource tokens is refutable (`unsat`).
-     * *Theorem 3 (Memory Evaporation)*: RAM tmpfs execution commits zero physical host NTFS disk bytes (`unsat`).
+     * *Theorem 3 (Memory Evaporation / Zero Disk Mutation)*: RAM tmpfs execution commits zero physical host NTFS disk bytes (`unsat`).
+     * *Theorem 4 (Secret Non-Exfiltration)*: Outbound streams containing high-entropy credential tokens cannot exit unredacted (`unsat`).
+     * *Theorem 5 (PTY Isolation)*: Interactive pseudo-terminal processes cannot escape their allocated namespace or inherit host terminal control (`unsat`).

@@ -43,7 +43,7 @@
 - **Camada de Isolamento:** Seccomp-BPF Ring-0, gVisor Sentry AST, Bubblewrap namespaces, MMU CoW forker, PTY POSIX terminal isolation.
 - **Formato de Empacotamento:** OCI Image Spec v1.1 rootless unpacker.
 - **Interfaces Públicas:**
-  - Drop-in SDK: `from hermetic_sandbox import Sandbox, Process, CommandResult, StreamChunk, PTYSession`
+  - Drop-in SDK: `from hermetic_sandbox import Sandbox, HermeticSandbox, Process, CommandResult, StreamChunk, PTYSession, ReplayRecorder, ReplayEngine`
   - CLI: `orchestrator.py` / `hermetic.cmd` / `hyperion.cmd`
   - MCP: Servidor JSON-RPC 2.0 stdio
 
