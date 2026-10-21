@@ -1,8 +1,8 @@
-# Hyperion Agent Sandbox: Security Architecture & Threat Model
+# Hermetic MicroVM Sandbox: Security Architecture & Threat Model
 
 ## 1. Adversarial Threat Model
 
-Hyperion is engineered under the assumption that all executed code is **actively hostile and adversarial**. This includes:
+Hermetic MicroVM Sandbox is engineered under the assumption that all executed code is **actively hostile and adversarial**. This includes:
 - Remote code execution payloads designed to escape containers.
 - Fork-bombs attempting to exhaust host process tables.
 - Memory allocation bombs attempting to trigger Host OS OOM killers.

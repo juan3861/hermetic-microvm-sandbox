@@ -1,8 +1,8 @@
-# Hyperion Agent Sandbox: Architecture Deep Dive
+# Hermetic MicroVM Sandbox: Architecture Deep Dive
 
 ## 1. Executive Summary
 
-**Hyperion Agent Sandbox** (`TITAN-HYPERION APEX`) is an industrial-grade, dual-engine code execution runtime designed specifically for Autonomous AI Agents, Reinforcement Learning loops, and untrusted repository compilation.
+**Hermetic MicroVM Sandbox** (`HERMETIC-MICROVM APEX`) is an industrial-grade, dual-engine code execution runtime designed specifically for Autonomous AI Agents, Reinforcement Learning loops, and untrusted repository compilation.
 
 Traditional sandboxes (Docker, Firecracker bare-metal, gVisor) suffer from significant structural bottlenecks when deployed in agentic workflows:
 1. **Boot Latency Tax**: Docker cold starts take $1.5\text{ to }3.5\text{ seconds}$ per task.

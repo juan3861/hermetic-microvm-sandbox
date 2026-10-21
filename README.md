@@ -1,19 +1,19 @@
 <div align="center">
 
-# ⚡ Hyperion Agent Sandbox (TITAN-HYPERION APEX)
+# ⚡ Hermetic MicroVM Sandbox
 
-### *The Ultra-Fast Dual-Engine AGI Agent Sandbox & Hermetic Polyglot MicroVM Runtime*
+### *The Ultra-Fast Hermetic MicroVM & Silicon Sandbox for AI Agents*
 
-[![CI](https://github.com/juan3861/hyperion-agent-sandbox/actions/workflows/ci.yml/badge.svg)](https://github.com/juan3861/hyperion-agent-sandbox/actions)
+[![CI](https://github.com/juan3861/hermetic-microvm-sandbox/actions/workflows/ci.yml/badge.svg)](https://github.com/juan3861/hermetic-microvm-sandbox/actions)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-brightgreen.svg)](https://python.org)
 [![Architecture](https://img.shields.io/badge/Architecture-Dual--Engine_Cloud_%2B_Local-orange.svg)](#architecture)
 [![Rank](https://img.shields.io/badge/Benchmark-Rank_%231_Over_Docker_%26_Firecracker-gold.svg)](BENCHMARKS.md)
 [![Security](https://img.shields.io/badge/Red--Team_Containment-100%25_Verified-purple.svg)](SECURITY.md)
 
-**Hyperion** is an industrial-grade, dual-engine code execution runtime designed from first principles for **Autonomous AI Agents (AGI)**, Reinforcement Learning (RL) execution loops, and secure polyglot codebase dissection. 
+**Hermetic MicroVM Sandbox** is an industrial-grade, dual-engine code execution runtime designed from first principles for **Autonomous AI Agents (AGI)**, Reinforcement Learning (RL) execution loops, and secure polyglot codebase dissection. 
 
-By unifying a **5-Tier Cloud Cascade** (WebContainers Wasm, Firecracker MicroVMs) with a **Zero-Daemon Local-Core** (`bwrap` in `/dev/shm` DDR RAM) and a **Quantum-Mathematical Cognitive Cortex** (`fastmft`, `tensolang`, `soma-nexus`, `Z3 SMT`, `ARIA`), Hyperion eliminates the latency, disk wear, and security vulnerabilities of legacy container systems.
+By unifying a **5-Tier Cloud Cascade** (WebContainers Wasm, Firecracker MicroVMs) with a **Zero-Daemon Local-Core** (`bwrap` in `/dev/shm` DDR RAM, native C Seccomp-BPF Ring-0 trap, MMU CoW) and a **Quantum-Mathematical Cognitive Cortex** (`fastmft`, `tensolang`, `soma-nexus`, `Z3 SMT`, `ARIA`), Hermetic MicroVM Sandbox eliminates the latency, disk wear, and security vulnerabilities of legacy container systems.
 
 ---
 
@@ -122,8 +122,8 @@ Hyperion includes a 6-vector adversarial attack suite (`security/adversarial_red
 
 ### 2. Installation
 ```bash
-git clone https://github.com/juan3861/hyperion-agent-sandbox.git
-cd hyperion-agent-sandbox
+git clone https://github.com/juan3861/hermetic-microvm-sandbox.git
+cd hermetic-microvm-sandbox
 pip install -r requirements.txt
 ```
 
@@ -133,26 +133,26 @@ Run full end-to-end dual-engine mission:
 ```bash
 python orchestrator.py run --target /path/to/repo --lang python
 # Or on Windows:
-hyperion.cmd run
+hermetic.cmd run
 ```
 
 Run adversarial red-team containment suite:
 ```bash
 python orchestrator.py redteam
 # Or on Windows:
-hyperion.cmd redteam
+hermetic.cmd redteam
 ```
 
 Run empirical benchmark matrix:
 ```bash
 python orchestrator.py benchmark
 # Or on Windows:
-hyperion.cmd benchmark
+hermetic.cmd benchmark
 ```
 
 Run polyglot code inside hermetic RAM sandbox:
 ```bash
-python orchestrator.py polyglot --code "print('Hello from Hyperion DDR RAM!')" --lang python
+python orchestrator.py polyglot --code "print('Hello from Hermetic MicroVM DDR RAM!')" --lang python
 ```
 
 Execute quantum-topological codebase cartography:

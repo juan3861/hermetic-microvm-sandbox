@@ -1,10 +1,10 @@
-# Hyperion Agent Sandbox: Empirical Competitive Benchmarks
+# Hermetic MicroVM Sandbox: Empirical Competitive Benchmarks
 
 ## 1. Benchmark Methodology
 
 All benchmarks were executed on an AMD Ryzen 9 / DDR5 RAM architecture running Windows 11 Host + WSL2 Linux Kernel 6.6.87.2 and measured using high-precision hardware timestamps (`time.perf_counter_ns`).
 
-Testing matrix compares **TITAN-HYPERION APEX** against three standard industry baselines:
+Testing matrix compares **Hermetic MicroVM Sandbox (APEX)** against three standard industry baselines:
 1. **Standard Docker Container** (`docker run --rm alpine ...`)
 2. **Bare MicroVM (Firecracker)** (`firectl` / `firecracker-vmm`)
 3. **Host Subprocess Code Interpreter** (`python -c ...` / `subprocess.Popen`)
