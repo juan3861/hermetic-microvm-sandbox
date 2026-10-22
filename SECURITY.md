@@ -98,8 +98,11 @@ For agentic workflows exploring speculative code execution paths (Tree-of-Though
 - **Non-Interference**: Mutations made inside a branch are invisible to other branches. SMT Theorem 6 formally guarantees branch isolation.
 - **Deterministic 3-Way Diff & Merge**: Structured file diffs can be merged back into parent branches with collision detection and SMT Theorem 7 monotonic invariance guarantees.
 
-### 7.2 SLSA Level 3 & In-Toto Cryptographic Provenance Attestation
+### 7.2 SLSA Level 3 & In-Toto Cryptographic Provenance Attestation (Sigstore / Cosign Dual-Mode)
 To prevent supply chain attacks and guarantee verifiable agent trajectory audit trails, Hyperion integrates `ProvenanceAttestor` ([`security/provenance_attestor.py`](file:///F:/TITAN_HYPERION_OMEGA/security/provenance_attestor.py)):
 - **Standardized In-Toto Statement (`https://in-toto.io/Statement/v1`)**: Records subject artifact SHA-256 hashes.
 - **SLSA Provenance v1.0 Envelope (`https://slsa.dev/provenance/v1`)**: Cryptographically attests to build definition, builder ID (`https://github.com/juan3861/hermetic-microvm-sandbox/agent-sandbox@v2.5.0`), invocation parameters, and execution environment metadata.
-- **HMAC-SHA256 Cryptographic Signature**: Generates tamper-proof DSSE envelopes verified in **$<1\text{ ms}$** without external cloud dependencies.
+- **Asymmetric ECDSA NIST P-256 (Sigstore / Cosign DSSE PAE)**: Signs DSSE Pre-Authentication Encodings using ephemeral curve `SECP256R1` keys in DDR RAM, enabling decentralized third-party verification using strictly public keys without secret sharing.
+- **Sigstore Bundle v0.3 Compliance**: Exports valid Sigstore bundles (`application/vnd.dev.sigstore.bundle+json;version=0.3`) compatible with Cosign and Rekor transparency logs.
+- **Airgapped OIDC Identity Attestation**: Binds agent identity claims (`issuer`, `subject`, `actor`, `workflow`) directly into the provenance envelope.
+- **Symmetric HMAC-SHA256 Mode**: Ultra-low latency fallback for high-throughput internal swarm verification loops.

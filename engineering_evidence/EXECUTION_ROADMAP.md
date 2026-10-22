@@ -46,3 +46,4 @@ flowchart TD
 | **DAG-9** | Executar a bateria completa de 26 suítes de testes sob o `AetherMind_Strict_Auditor.py` | Ambiente Host | Zero regressão |
 | **DAG-10**| Executar certificação de 3 rodadas contínuas (`run_3_continuous_rounds_audit.py`) | 78 execuções totais | Zero regressão |
 | **DAG-11**| Documentar evidências, pontuação atestada e sincronizar com GitHub | `engineering_evidence/`, git remote | Conclusão |
+| **DAG-12**| Eliminação Integral de Dívida Técnica: Integrar suporte Sigstore / Cosign DSSE (ECDSA NIST P-256) e OIDC Identity Attestation no `ProvenanceAttestor` | `security/provenance_attestor.py`, `tests/test_cryptographic_provenance_attestor.py`, `sdk/hermetic_sandbox.py` | Concluído (Dívida Zero) |

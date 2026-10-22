@@ -7,7 +7,7 @@
 - **Architectural Grade**: ASI / Master Senior Engineering Supremacy (26 Master Suites + Alpha-C4 Protocol + Zero Technical Debt)
 
 ## Master Alpha-C4 Protocol Execution (v2.5.0 Release)
-- **Agent 1 (The Builder)**: Implementou Tree-of-Thought (ToT) In-RAM Branching & State Diff/Merge (`core/branch_manager.py`), Atestação Criptográfica de Proveniência SLSA Nível 3 & In-Toto (`security/provenance_attestor.py`) e expansão dos Teoremas Formais Z3 SMT para 7 Teoremas (`core/formal_invariants_prover.py`).
+- **Agent 1 (The Builder)**: Implementou Tree-of-Thought (ToT) In-RAM Branching & State Diff/Merge (`core/branch_manager.py`), Atestação Criptográfica de Proveniência SLSA Nível 3, In-Toto e Sigstore/Cosign DSSE com ECDSA NIST P-256 e OIDC Identity Attestation (`security/provenance_attestor.py`) e expansão dos Teoremas Formais Z3 SMT para 7 Teoremas (`core/formal_invariants_prover.py`). Eliminação integral de dívida técnica com verificação descentralizada por chave pública.
 - **Agent 2 (The Auditor)**: Conduziu auditoria adversarial empírica estrita com tolerância zero para teatro técnico. Validou a não-interferência de ramos em RAM, a neutralização de falsificação de assinaturas e a ausência de regressões nas 24 suítes preexistentes. Atestou conformidade formal com o protocolo Alpha-C4 (Modo `SINGLE-AGENT+TOOLS` com `DUAL_AGENT_CERTIFICATION = BLOCKED` per regra anti-gaming).
 
 ## Certificação e Auditoria Empírica (26/26 Suítes 100% GREEN — Tríplice Convergência Consecutiva)

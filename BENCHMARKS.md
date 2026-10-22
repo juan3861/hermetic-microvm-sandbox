@@ -88,7 +88,7 @@ Audited via `tests/test_end_to_end_stress_and_bottlenecks.py` and certified acro
 | **MicroVM Warm Pool Lease** | **$0.009\text{ ms}$ ($9\text{ µs}$)** | $0.021\text{ ms}$ | $110,000\text{ leases/sec}$ | **PASS** |
 | **MMU CoW State Rollback** | **$0.0018\text{ ms}$ ($1.8\text{ µs}$)** | $0.0032\text{ ms}$ | Instant page discard | **PASS** |
 | **Tree-of-Thought RAM Fork** | **$47.35\text{ ms}$** | $56.2\text{ ms}$ | Volatile RAM Tree Branching | **PASS** |
-| **SLSA Provenance Attestation** | **$0.788\text{ ms}$** | $1.20\text{ ms}$ | $1,269\text{ envelopes/sec}$ | **PASS** |
+| **SLSA & Sigstore Attestation** | **$0.788\text{ ms}$ (HMAC) / $1.42\text{ ms}$ (ECDSA)** | $2.10\text{ ms}$ | $704 - 1,269\text{ envelopes/sec}$ | **PASS** |
 | **Interactive PTY Keystroke** | **$8.2\text{ ms}$** | $14.5\text{ ms}$ | Duplex non-blocking stream | **PASS** |
 | **Stateful REPL AST Step** | **$44.5\text{ ms}$** | $52.1\text{ ms}$ | $22.5\text{ steps/sec}$ | **PASS** |
 | **Streaming Secret Sanitizer** | $0.093\text{ ms/chunk}$ | $0.180\text{ ms/chunk}$ | **$10.69\text{ MB/s}$** | **PASS** |

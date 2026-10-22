@@ -318,7 +318,7 @@ class Sandbox:
         return self.branch_manager.merge_branch(source_branch=source, target_branch=target, strategy=strategy)
 
     # -------------------------------------------------------------------------
-    # SLSA Level 3 & In-Toto Cryptographic Provenance Attestation
+    # SLSA Level 3 & In-Toto Cryptographic Provenance Attestation (Sigstore / Cosign Dual-Mode)
     # -------------------------------------------------------------------------
     def attest_execution(
         self,
@@ -326,9 +326,10 @@ class Sandbox:
         stdout: str = "",
         stderr: str = "",
         exit_code: int = 0,
-        duration_s: float = 0.0
+        duration_s: float = 0.0,
+        oidc_claims: Optional[Dict[str, Any]] = None
     ) -> ExecutionProvenanceReceipt:
-        """Generates a tamper-evident In-Toto / SLSA v1.0 signed provenance receipt."""
+        """Generates a tamper-evident In-Toto / SLSA v1.0 signed provenance receipt (ECDSA P-256 / Sigstore DSSE)."""
         return self.provenance_attestor.generate_attestation(
             command=command,
             stdout=stdout,
@@ -336,12 +337,17 @@ class Sandbox:
             exit_code=exit_code,
             session_id=self.id,
             sandbox_config={"memory_mb": self.memory_mb, "seccomp_bpf": True, "landlock": True, "airgap": True},
-            duration_s=duration_s
+            duration_s=duration_s,
+            oidc_claims=oidc_claims
         )
 
-    def verify_attestation(self, receipt: ExecutionProvenanceReceipt) -> bool:
+    def verify_attestation(
+        self,
+        receipt: ExecutionProvenanceReceipt,
+        public_key_pem: Optional[str] = None
+    ) -> bool:
         """Verifies the authenticity and cryptographic signature of a provenance receipt."""
-        return self.provenance_attestor.verify_attestation(receipt)
+        return self.provenance_attestor.verify_attestation(receipt, public_key_pem=public_key_pem)
 
     def close(self) -> None:
         """Evaporates the sandbox and all RAM allocations instantly."""

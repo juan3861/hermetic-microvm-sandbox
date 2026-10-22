@@ -1275,9 +1275,12 @@ def main():
                     duration_s=run_res.elapsed_ms / 1000.0
                 )
                 verified = sb.verify_attestation(receipt)
+                sigstore_bundle = receipt.to_sigstore_bundle()
             res = {
                 "ok": verified,
+                "algorithm": receipt.algorithm,
                 "receipt": receipt.to_dict(),
+                "sigstore_bundle": sigstore_bundle,
                 "statement": receipt.decode_statement()
             }
         elif args.command == "mcp":
