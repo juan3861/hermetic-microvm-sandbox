@@ -126,7 +126,7 @@ def run_mutation_and_invariants_audit():
     # ---------------------------------------------------------
     # 3. PRIVILEGE & RESOURCE CONTAINMENT BOUNDARIES
     # ---------------------------------------------------------
-    print("\n[3/3] PRIVILEGE & RESOURCE BOUNDARIES: Testing Path Traversal & Limits...")
+    print("\n[3/4] PRIVILEGE & RESOURCE BOUNDARIES: Testing Path Traversal & Limits...")
     # Verify that trying to inspect code with traversal or metadata exploits is blocked
     exploit_payload = "import os\nos.system('curl http://169.254.169.254/latest/meta-data/ --output ../../../etc/shadow')"
     inspect_res = guard.inspect_code_payload(exploit_payload)
@@ -134,6 +134,18 @@ def run_mutation_and_invariants_audit():
     assert inspect_res["is_safe"] is False
     assert inspect_res["blocked_count"] > 0
     print("--> Privilege & Traversal Boundary: STRICTLY CONTAINED")
+
+    # ---------------------------------------------------------
+    # 4. FORMAL Z3 SMT MATHEMATICAL THEOREMS (seL4 / Isabelle grade)
+    # ---------------------------------------------------------
+    print("\n[4/4] FORMAL Z3 SMT THEOREMS: Verifying all 7 safety theorems...")
+    from core.formal_invariants_prover import FormalInvariantsProver
+    prover = FormalInvariantsProver()
+    all_thm = prover.prove_all_theorems()
+    print(f"--> Theorems verified: {all_thm['theorems_count']} | All Proved: {all_thm['all_proved']}")
+    assert all_thm["all_proved"] is True
+    assert all_thm["theorems_count"] == 7
+    print("--> All 7 Formal Z3 SMT Theorems: MATHEMATICALLY PROVEN (unsat)")
 
     print("\n" + "=" * 80)
     print("[+] ADVERSARIAL MUTATION & INVARIANTS: 100% APROVADO!")

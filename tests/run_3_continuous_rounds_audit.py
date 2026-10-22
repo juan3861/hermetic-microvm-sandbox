@@ -36,7 +36,7 @@ def run_single_round(round_num: int) -> Dict[str, Any]:
 
     for idx, test_file in enumerate(TEST_FILES, start=1):
         test_path = PROJECT_ROOT / "tests" / test_file
-        print(f"[{round_num}:{idx:02d}/24] Running {test_file} ...", end=" ", flush=True)
+        print(f"[{round_num}:{idx:02d}/{len(TEST_FILES):02d}] Running {test_file} ...", end=" ", flush=True)
         t0 = time.perf_counter()
         
         proc = subprocess.run(

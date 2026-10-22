@@ -1133,6 +1133,15 @@ def main():
     # Command: replay (Deterministic trajectory record and replay test)
     replay_p = subparsers.add_parser("replay", help="Test deterministic execution trace recording and replay")
 
+    # Command: branch (Tree-of-Thought in-RAM state branching & diff/merge)
+    branch_p = subparsers.add_parser("branch", help="Tree-of-Thought in-RAM state branching & diff/merge")
+    branch_p.add_argument("--action", choices=["list", "fork", "diff", "merge"], default="list")
+    branch_p.add_argument("--name", default="search_b1", help="Branch name")
+
+    # Command: attest (SLSA v1.0 / In-Toto cryptographic provenance attestation)
+    attest_p = subparsers.add_parser("attest", help="Generate SLSA v1.0 / In-Toto cryptographic provenance attestation")
+    attest_p.add_argument("--cmd", default="echo 'ATTEST_OK'", help="Command to run and attest")
+
     # Fallback top-level arguments if no subcommand given
     parser.add_argument("--target", default=r"F:\UCIP", help="Local path to dissect")
     parser.add_argument("--remote-url", default="https://github.com/juan3861/UCIP.git", help="Remote Git URL")
@@ -1238,6 +1247,38 @@ def main():
                 "trace_events": trace["event_count"],
                 "reproducibility_score": replay_res["reproducibility_score"],
                 "replay_res": replay_res
+            }
+        elif args.command == "branch":
+            from sdk.hermetic_sandbox import Sandbox
+            with Sandbox(memory_mb=128) as sb:
+                sb.files.write("main_file.py", "x = 10\n")
+                fork_res = sb.fork_branch(args.name)
+                sb.switch_branch(args.name)
+                sb.files.write("branch_file.py", "y = 20\n")
+                diff_res = sb.diff_branches("main", args.name)
+                merge_res = sb.merge_branch(args.name, "main")
+            res = {
+                "ok": True,
+                "fork": fork_res,
+                "diff": diff_res.to_dict(),
+                "merge": merge_res
+            }
+        elif args.command == "attest":
+            from sdk.hermetic_sandbox import Sandbox
+            with Sandbox(memory_mb=128) as sb:
+                run_res = sb.commands.run(args.cmd)
+                receipt = sb.attest_execution(
+                    command=args.cmd,
+                    stdout=run_res.stdout,
+                    stderr=run_res.stderr,
+                    exit_code=run_res.exit_code,
+                    duration_s=run_res.elapsed_ms / 1000.0
+                )
+                verified = sb.verify_attestation(receipt)
+            res = {
+                "ok": verified,
+                "receipt": receipt.to_dict(),
+                "statement": receipt.decode_statement()
             }
         elif args.command == "mcp":
             from mcp.hyperion_mcp_server import run_stdio_server

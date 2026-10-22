@@ -1,6 +1,6 @@
-# EXECUTION ROADMAP — DAG IMPLEMENTATION PLAN (ROUND 3)
-**System:** Hermetic MicroVM Sandbox v2.4.0  
-**Timestamp:** 2026-10-21T17:37:00-03:00  
+# EXECUTION ROADMAP — DAG IMPLEMENTATION PLAN (ALPHA-C4)
+**System:** Hermetic MicroVM Sandbox v2.5.0  
+**Timestamp:** 2026-10-22T09:19:00-03:00  
 
 ---
 
@@ -8,23 +8,25 @@
 
 ```mermaid
 flowchart TD
-    Contract["ACCEPTANCE_CONTRACT.md (Frozen v2.1)"] --> D1["DAG-1: core/pty_manager.py"]
-    Contract --> D3["DAG-3: core/replay_recorder.py"]
-    Contract --> D5["DAG-5: core/formal_invariants_prover.py (Thm 4 & 5)"]
+    Contract["ACCEPTANCE_CONTRACT.md (Alpha-C4 Frozen)"] --> T1["DAG-1: core/branch_manager.py"]
+    Contract --> T2["DAG-2: security/provenance_attestor.py"]
+    Contract --> T3["DAG-3: core/formal_invariants_prover.py (Thm 6 & 7)"]
     
-    D1 --> D2["DAG-2: sdk/hermetic_sandbox.py (sandbox.pty integration)"]
-    D3 --> D4["DAG-4: sdk/hermetic_sandbox.py (sandbox.replay integration)"]
+    T1 --> T4["DAG-4: sdk/hermetic_sandbox.py (Branching & Attestation Integration)"]
+    T2 --> T4
+    T4 --> T5["DAG-5: orchestrator.py (CLI branch & attest)"]
     
-    D2 --> D6["DAG-6: tests/test_interactive_pty.py"]
-    D4 --> D7["DAG-7: tests/test_deterministic_replay.py"]
-    D5 --> D8["DAG-8: orchestrator.py (CLI pty & replay)"]
+    T1 --> T6["DAG-6: tests/test_tree_of_thought_branching.py"]
+    T2 --> T7["DAG-7: tests/test_cryptographic_provenance_attestor.py"]
+    T3 --> T8["DAG-8: Update Prover APIs & Theorem Verification"]
     
-    D6 --> D9["DAG-9: Full 23 Test Suites Execution & Strict Auditor"]
-    D7 --> D9
-    D8 --> D9
+    T5 --> T9["DAG-9: Full 26 Master Test Suites Execution"]
+    T6 --> T9
+    T7 --> T9
+    T8 --> T9
     
-    D9 --> D10["DAG-10: Independent Adversarial Subagent Audit"]
-    D10 --> D11["DAG-11: AUDIT_DECISION.md & Git Commit v2.4.0"]
+    T9 --> T10["DAG-10: 3 Continuous Rounds Audit (tests/run_3_continuous_rounds_audit.py)"]
+    T10 --> T11["DAG-11: Evidence Receipts, Quality Gate Hardening & Git Sync"]
 ```
 
 ---
@@ -33,14 +35,14 @@ flowchart TD
 
 | Task ID | Descrição | Arquivos Afetados | Risco & Rollback |
 |---|---|---|---|
-| **DAG-1** | Implementar `core/pty_manager.py` (PTYSession, openpty bridge, non-blocking I/O) | `core/pty_manager.py` | Baixo (módulo novo) |
-| **DAG-2** | Integrar PTY em `sdk/hermetic_sandbox.py` | `sdk/hermetic_sandbox.py`, `hermetic_sandbox.py` | Baixo (aditivo) |
-| **DAG-3** | Implementar `core/replay_recorder.py` (Trajectory ledger, hashing, replay) | `core/replay_recorder.py` | Baixo (módulo novo) |
-| **DAG-4** | Integrar Replay no `Sandbox` (`export_trace`, `replay_trace`) | `sdk/hermetic_sandbox.py` | Baixo (aditivo) |
-| **DAG-5** | Adicionar Teoremas 4 e 5 em `core/formal_invariants_prover.py` | `core/formal_invariants_prover.py` | Baixo (aditivo) |
-| **DAG-6** | Criar suíte de teste `tests/test_interactive_pty.py` | `tests/test_interactive_pty.py` | Baixo |
-| **DAG-7** | Criar suíte de teste `tests/test_deterministic_replay.py` | `tests/test_deterministic_replay.py` | Baixo |
-| **DAG-8** | Integrar CLI `pty` e `replay` no `orchestrator.py` | `orchestrator.py`, `pyproject.toml`, `.github/workflows/ci.yml` | Baixo |
-| **DAG-9** | Executar as 23 suítes completas de testes sob o `AetherMind_Strict_Auditor.py` | Ambiente Host | Zero risco de regressão |
-| **DAG-10**| Submeter a auditor independente adversarial (Agente 2) | Subagente cognitivo | Zero risco |
-| **DAG-11**| Documentar evidências e sincronizar com GitHub | `engineering_evidence/`, git remote | Conclusão |
+| **DAG-1** | Implementar `core/branch_manager.py` (Tree-of-Thought in-RAM Branching, switch, diff, merge) | `core/branch_manager.py` | Baixo (módulo novo) |
+| **DAG-2** | Implementar `security/provenance_attestor.py` (SLSA v1.0 & In-Toto Cryptographic Provenance) | `security/provenance_attestor.py` | Baixo (módulo novo) |
+| **DAG-3** | Formular e provar Teoremas 6 e 7 via Z3 SMT em `core/formal_invariants_prover.py` | `core/formal_invariants_prover.py` | Baixo (aditivo) |
+| **DAG-4** | Integrar ToT Branching e Attestation no Universal SDK | `sdk/hermetic_sandbox.py`, `hermetic_sandbox.py` | Baixo (aditivo) |
+| **DAG-5** | Integrar subcomandos CLI `branch` e `attest` no `orchestrator.py` | `orchestrator.py` | Baixo |
+| **DAG-6** | Criar suíte de teste `tests/test_tree_of_thought_branching.py` | `tests/test_tree_of_thought_branching.py` | Baixo |
+| **DAG-7** | Criar suíte de teste `tests/test_cryptographic_provenance_attestor.py` | `tests/test_cryptographic_provenance_attestor.py` | Baixo |
+| **DAG-8** | Atualizar prover e suítes de invariantes | `tests/test_mutation_and_invariants.py`, `core/formal_invariants_prover.py` | Baixo |
+| **DAG-9** | Executar a bateria completa de 26 suítes de testes sob o `AetherMind_Strict_Auditor.py` | Ambiente Host | Zero regressão |
+| **DAG-10**| Executar certificação de 3 rodadas contínuas (`run_3_continuous_rounds_audit.py`) | 78 execuções totais | Zero regressão |
+| **DAG-11**| Documentar evidências, pontuação atestada e sincronizar com GitHub | `engineering_evidence/`, git remote | Conclusão |

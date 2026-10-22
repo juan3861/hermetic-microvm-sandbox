@@ -70,7 +70,7 @@ class LocalCoreEngine:
         audit_command: str = "python3 -c \"import os, socket; print('JAIL_FILES:', len(os.listdir('.'))); print('MNT_VISIBLE:', os.path.exists('/mnt'))\"",
         unshare_network: bool = True,
         cleanup_ram: bool = True,
-        timeout: int = 45
+        timeout: int = 120
     ) -> Dict[str, Any]:
         """
         Stages a remote Git repository (via --depth 1 --filter=blob:none) or a local

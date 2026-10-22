@@ -205,7 +205,8 @@ class CapsuleDistiller:
                 repo_url_or_path=staging_dir,
                 audit_command="python3 capsule.py",
                 unshare_network=True,
-                cleanup_ram=True
+                cleanup_ram=True,
+                timeout=120
             )
             report["airgap_jail"] = "WSL2 Ubuntu bwrap --unshare-all"
             report["zero_wear_ddr_ram"] = True

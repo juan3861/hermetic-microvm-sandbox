@@ -268,9 +268,11 @@ def test_end_to_end_diagnostics():
     t_smt = (time.perf_counter() - t0) * 1000
     print(f"--> Z3 SMT Theorem Verification Solved in {round(t_smt, 2)} ms:")
     for th_id, info in smt_results.items():
+        if not isinstance(info, dict):
+            continue
         check_res = info.get("check_result", "unknown")
         proven = info.get("mathematically_proven", False)
-        print(f"    [{th_id}] {info['theorem']}: {check_res} (Proven={proven})")
+        print(f"    [{th_id}] {info.get('theorem', th_id)}: {check_res} (Proven={proven})")
         assert proven is True
     metrics["z3_smt_total_ms"] = round(t_smt, 2)
     if t_smt > 1000:

@@ -53,8 +53,10 @@ jobs:
         python orchestrator.py gpu --action probe
         python orchestrator.py fuzz
         python orchestrator.py mesh --action status
+        python orchestrator.py branch
+        python orchestrator.py attest
 
-    - name: Execute Full 24 Master Test Suites
+    - name: Execute Full 26 Master Test Suites
       run: |
         set -e
         for test_file in tests/test_*.py; do

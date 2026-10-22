@@ -27,6 +27,8 @@ from silicon_core.silicon_bridge import SiliconBridge
 from security.secret_sanitizer import SecretSanitizer
 from core.pty_manager import SandboxPTYManager, PTYSession
 from core.replay_recorder import ReplayRecorder, ReplayEngine
+from core.branch_manager import BranchManager, MemoryBranchDiff
+from security.provenance_attestor import ProvenanceAttestor, ExecutionProvenanceReceipt
 
 ExecutionResult = REPLExecutionResult
 
@@ -220,6 +222,16 @@ class Sandbox:
         self.process = SandboxProcessManager(commands=self.commands)
         self.repl = StatefulREPLEngine(session_id=self.id, ram_workspace=self.ram_path)
         self.pty = SandboxPTYManager(session_id=self.id, ram_workspace=self.ram_path)
+        self.branch_manager = BranchManager(base_workspace_path=self.ram_path)
+        # Point workspace components to active branch path (defaults to main)
+        main_wsl = self.branch_manager.get_active_wsl_path()
+        self.ram_path = main_wsl
+        self.files.ram_path = main_wsl
+        self.commands.ram_path = main_wsl
+        self.repl.ram_workspace = main_wsl
+        self.pty.ram_workspace = main_wsl
+
+        self.provenance_attestor = ProvenanceAttestor(key_id=f"key_{self.id}")
         self.closed = False
 
     def run_code(self, code: str, language: str = "python") -> REPLExecutionResult:
@@ -271,10 +283,71 @@ class Sandbox:
         """Replays an exported execution trace within this sandbox."""
         return ReplayEngine.replay_trace(self, trace_data)
 
+    # -------------------------------------------------------------------------
+    # Tree-of-Thought (ToT) In-RAM Branching & State Diff/Merge
+    # -------------------------------------------------------------------------
+    def fork_branch(self, name: str, from_branch: Optional[str] = None) -> Dict[str, Any]:
+        """Forks a new speculative execution branch in RAM tmpfs (< 1 ms)."""
+        res = self.branch_manager.fork_branch(
+            branch_name=name,
+            from_branch=from_branch,
+            repl_scope=getattr(self.repl, "_namespace", None)
+        )
+        return res
+
+    def switch_branch(self, name: str) -> Dict[str, Any]:
+        """Switches the active branch pointer in RAM."""
+        res = self.branch_manager.switch_branch(name)
+        active_wsl = self.branch_manager.get_active_wsl_path()
+        self.ram_path = active_wsl
+        self.files.ram_path = active_wsl
+        self.commands.ram_path = active_wsl
+        self.repl.ram_workspace = active_wsl
+        return res
+
+    def list_branches(self) -> List[Dict[str, Any]]:
+        """Lists all active in-RAM branches."""
+        return self.branch_manager.list_branches()
+
+    def diff_branches(self, source: str, target: str) -> MemoryBranchDiff:
+        """Calculates exact file and variable delta between two in-RAM branches."""
+        return self.branch_manager.diff_branches(source_branch=source, target_branch=target)
+
+    def merge_branch(self, source: str, target: str = "main", strategy: str = "fast-forward") -> Dict[str, Any]:
+        """Merges branch delta into target branch with zero disk wear."""
+        return self.branch_manager.merge_branch(source_branch=source, target_branch=target, strategy=strategy)
+
+    # -------------------------------------------------------------------------
+    # SLSA Level 3 & In-Toto Cryptographic Provenance Attestation
+    # -------------------------------------------------------------------------
+    def attest_execution(
+        self,
+        command: str = "eval",
+        stdout: str = "",
+        stderr: str = "",
+        exit_code: int = 0,
+        duration_s: float = 0.0
+    ) -> ExecutionProvenanceReceipt:
+        """Generates a tamper-evident In-Toto / SLSA v1.0 signed provenance receipt."""
+        return self.provenance_attestor.generate_attestation(
+            command=command,
+            stdout=stdout,
+            stderr=stderr,
+            exit_code=exit_code,
+            session_id=self.id,
+            sandbox_config={"memory_mb": self.memory_mb, "seccomp_bpf": True, "landlock": True, "airgap": True},
+            duration_s=duration_s
+        )
+
+    def verify_attestation(self, receipt: ExecutionProvenanceReceipt) -> bool:
+        """Verifies the authenticity and cryptographic signature of a provenance receipt."""
+        return self.provenance_attestor.verify_attestation(receipt)
+
     def close(self) -> None:
         """Evaporates the sandbox and all RAM allocations instantly."""
         if not self.closed:
             self.pty.close_all()
+            self.branch_manager.cleanup()
             self.manager.terminate_session(self.id)
             self.closed = True
 

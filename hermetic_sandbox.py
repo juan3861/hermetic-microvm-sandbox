@@ -17,7 +17,11 @@ from sdk.hermetic_sandbox import (
     PTYSession,
     SandboxPTYManager,
     ReplayRecorder,
-    ReplayEngine
+    ReplayEngine,
+    BranchManager,
+    MemoryBranchDiff,
+    ProvenanceAttestor,
+    ExecutionProvenanceReceipt
 )
 
 HermeticSandbox = Sandbox
@@ -35,6 +39,10 @@ __all__ = [
     "PTYSession",
     "SandboxPTYManager",
     "ReplayRecorder",
-    "ReplayEngine"
+    "ReplayEngine",
+    "BranchManager",
+    "MemoryBranchDiff",
+    "ProvenanceAttestor",
+    "ExecutionProvenanceReceipt"
 ]
-__version__ = "2.4.0"
+__version__ = "2.5.0"
