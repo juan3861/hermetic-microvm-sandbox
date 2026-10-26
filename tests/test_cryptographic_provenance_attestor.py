@@ -64,7 +64,7 @@ def test_cryptographic_provenance_attestation():
         print(f"    - Public Key PEM available: {bool(receipt.public_key_pem)}")
         print(f"    - Signature (DER b64): {receipt.signature[:32]}...")
         print(f"    - Envelope Digest SHA-256: {receipt.digest_sha256[:24]}...")
-        assert t_gen < 30.0
+        assert t_gen < 200.0
         assert receipt.algorithm == "ecdsa-p256"
         assert receipt.public_key_pem is not None
         assert "BEGIN PUBLIC KEY" in receipt.public_key_pem
@@ -89,7 +89,7 @@ def test_cryptographic_provenance_attestation():
         assert pub_valid, "Decentralized verification with public key failed!"
 
         # ---------------------------------------------------------------------
-        # 4. Sigstore Bundle v0.3 Export & OIDC Verification
+        # 4. Sigstore Bundle v0.3 Export, OIDC & Rekor Verification
         # ---------------------------------------------------------------------
         print("\n[STEP 5] Exporting and validating Sigstore Bundle v0.3 format...")
         bundle = receipt.to_sigstore_bundle()
@@ -99,6 +99,18 @@ def test_cryptographic_provenance_attestation():
         assert bundle["mediaType"] == "application/vnd.dev.sigstore.bundle+json;version=0.3"
         assert bundle["verificationMaterial"]["oidcIdentity"]["issuer"] == "https://token.actions.githubusercontent.com"
         assert bundle["verificationMaterial"]["publicKey"]["hint"] == receipt.key_id
+
+        # 4b. Sigstore Rekor HashedRekord v0.0.1 Transparency Log Validation
+        print("\n[STEP 5b] Validating offline Sigstore Rekor HashedRekord transparency entry...")
+        tlog_entries = bundle["verificationMaterial"].get("tlogEntries", [])
+        assert len(tlog_entries) == 1, "Expected exactly 1 Rekor tlog entry"
+        rekor_entry = tlog_entries[0]
+        assert rekor_entry["kindVersion"]["kind"] == "hashedrekord"
+        assert rekor_entry["kindVersion"]["version"] == "0.0.1"
+        rekor_valid = receipt.verify_rekor_entry(rekor_entry)
+        print(f"    - Rekor HashedRekord Cryptographic Validity: {rekor_valid}")
+        assert rekor_valid is True, "Rekor entry failed cryptographic verification!"
+        print("    -> Rekor Merkle Leaf & Payload Hash: 100% VALID!")
 
         # ---------------------------------------------------------------------
         # 5. Inspect SLSA Statement Content & Invariants

@@ -1,77 +1,32 @@
 {
-  "protocol": "ALPHA-C4",
-  "version": "1.0",
-  "timestamp": "2026-10-22T09:16:00-03:00",
-  "repository": {
-    "canonical_path": "F:\\TITAN_HYPERION_OMEGA",
-    "git_remote": "https://github.com/juan3861/hermetic-microvm-sandbox",
-    "baseline_commit": "0974bb08bb945d7d3d7515c1568e64cbe39151db",
-    "clean_working_tree": true
+  "protocol": "ALPHA-C7 DISCOVERY-100",
+  "version": "4.0.0",
+  "timestamp": "2026-10-26T01:00:00Z",
+  "base_commit": "829877b46d060576b04faa574f9a8a1dbe9353e9",
+  "execution_mode": "SINGLE_AGENT_WITH_TOOLS",
+  "external_ledger": "UNAVAILABLE",
+  "ledger_trust": "LOCAL_HASH_CHAIN_ONLY",
+  "weights": {
+    "functional_correctness_and_tests": 25,
+    "confinement_isolation_zero_disk_wear": 20,
+    "discovery_100_and_modular_reuse": 20,
+    "measured_performance_and_sub_ms_latency": 15,
+    "mathematical_smt_theorems": 10,
+    "governance_provenance_and_evidence": 10
   },
-  "execution_mode": {
-    "mode": "SINGLE-AGENT+TOOLS",
-    "dual_agent_certification_status": "BLOCKED",
-    "local_engineering_verdict_status": "INITIALIZED_UNKNOWN",
-    "anti_gaming_rule": "Alpha-C4 Section 0 & 8A.4 strictly adhered to (no simulated dual-agent certification)"
-  },
-  "criteria_weights": {
-    "functional_correctness_and_tests": {
-      "weight": 30,
-      "min_required": 30
-    },
-    "reliability_and_resilience": {
-      "weight": 25,
-      "min_required": 25
-    },
-    "security_and_confinement": {
-      "weight": 15,
-      "min_required": 15
-    },
-    "architecture_and_integration": {
-      "weight": 15,
-      "min_required": 15
-    },
-    "measured_performance": {
-      "weight": 10,
-      "min_required": 10
-    },
-    "telemetry_and_reproducibility": {
-      "weight": 5,
-      "min_required": 5
-    }
-  },
-  "approval_threshold": 95,
-  "mandatory_gates": [
-    "GATE_01_ZERO_REGRESSIONS_BASELINE_24_SUITES",
-    "GATE_02_TREE_OF_THOUGHT_BRANCH_ISOLATION",
-    "GATE_03_MEMORY_DIFF_AND_MERGE_CONSISTENCY",
-    "GATE_04_SLSA_IN_TOTO_PROVENANCE_SIGNING",
-    "GATE_05_Z3_SMT_THEOREM_6_BRANCH_INDEPENDENCE",
-    "GATE_06_Z3_SMT_THEOREM_7_MERGE_SECRET_INVARIANCE",
-    "GATE_07_ZERO_PHYSICAL_DISK_WEAR_NTFS_PROOF",
-    "GATE_08_LATENCY_CEILINGS_MET"
-  ],
-  "elimination_rules": [
-    "ANY_FAIL_LEADS_TO_REJECTED",
-    "ANY_UNKNOWN_MANDATORY_LEADS_TO_BLOCKED",
-    "SCORE_BELOW_95_LEADS_TO_REJECTED"
+  "passing_threshold": 95,
+  "eliminatory_criteria": [
+    "host_ntfs_mutation",
+    "discovery_100_data_fabrication",
+    "fake_independence_dual_agent",
+    "functional_regression_26_suites",
+    "smt_theorem_counterexample_sat"
   ],
   "hypotheses": [
-    {
-      "id": "H1",
-      "statement": "In-RAM branching takes < 1.0 ms and detects file additions, modifications, deletions without NTFS mutation."
-    },
-    {
-      "id": "H2",
-      "statement": "SLSA v1.0 provenance receipts are generated with verifiable Ed25519/HMAC signatures in < 2.0 ms."
-    },
-    {
-      "id": "H3",
-      "statement": "Theorems 6 and 7 evaluate to unsat via Microsoft Z3 SMT solver in < 50.0 ms."
-    },
-    {
-      "id": "H4",
-      "statement": "All pre-existing 24 master test suites execute green without regressions."
-    }
+    "H1: Discovery-100 contains 100 verified canonical repos without duplicates",
+    "H2: eBPF behavioral monitor operates in RAM < 1.0ms latency",
+    "H3: Sigstore Rekor HashedRekord entry conforms to v0.0.1 offline spec",
+    "H4: Formal Z3 Theorem 8 proved unsat for reversibility violation",
+    "H5: 27 test suites achieve 100% pass across 3 continuous rounds"
   ]
 }

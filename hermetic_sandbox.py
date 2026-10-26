@@ -21,7 +21,8 @@ from sdk.hermetic_sandbox import (
     BranchManager,
     MemoryBranchDiff,
     ProvenanceAttestor,
-    ExecutionProvenanceReceipt
+    ExecutionProvenanceReceipt,
+    BehavioralEBPFMonitor
 )
 
 HermeticSandbox = Sandbox
@@ -43,6 +44,7 @@ __all__ = [
     "BranchManager",
     "MemoryBranchDiff",
     "ProvenanceAttestor",
-    "ExecutionProvenanceReceipt"
+    "ExecutionProvenanceReceipt",
+    "BehavioralEBPFMonitor"
 ]
-__version__ = "2.5.0"
+__version__ = "2.6.0"

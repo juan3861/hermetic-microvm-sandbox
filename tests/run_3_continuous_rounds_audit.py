@@ -4,7 +4,7 @@ TITAN-HYPERION APEX — 3 Continuous Rounds End-to-End Stress & Bottleneck Certi
 Protocol:
   Executes 3 independent, back-to-back, full-spectrum validation rounds:
     - End-to-end stress & bottleneck diagnostics (PTY, REPL, Sanitizer, SMT, WarmPool)
-    - Complete battery of all 24 master test suites
+    - Complete battery of all 27 master test suites
   Any failure, bottleneck, or surprise regression in any round resets the qualification.
   Halts ONLY when 3 consecutive rounds achieve 100% green without any bottleneck or anomaly.
 """
@@ -44,7 +44,7 @@ def run_single_round(round_num: int) -> Dict[str, Any]:
             cwd=str(PROJECT_ROOT),
             capture_output=True,
             text=True,
-            timeout=180
+            timeout=300
         )
         elapsed = round(time.perf_counter() - t0, 2)
 

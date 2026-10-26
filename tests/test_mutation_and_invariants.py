@@ -138,14 +138,14 @@ def run_mutation_and_invariants_audit():
     # ---------------------------------------------------------
     # 4. FORMAL Z3 SMT MATHEMATICAL THEOREMS (seL4 / Isabelle grade)
     # ---------------------------------------------------------
-    print("\n[4/4] FORMAL Z3 SMT THEOREMS: Verifying all 7 safety theorems...")
+    print("\n[4/4] FORMAL Z3 SMT THEOREMS: Verifying all 8 safety theorems...")
     from core.formal_invariants_prover import FormalInvariantsProver
     prover = FormalInvariantsProver()
     all_thm = prover.prove_all_theorems()
     print(f"--> Theorems verified: {all_thm['theorems_count']} | All Proved: {all_thm['all_proved']}")
     assert all_thm["all_proved"] is True
-    assert all_thm["theorems_count"] == 7
-    print("--> All 7 Formal Z3 SMT Theorems: MATHEMATICALLY PROVEN (unsat)")
+    assert all_thm["theorems_count"] == 8
+    print("--> All 8 Formal Z3 SMT Theorems: MATHEMATICALLY PROVEN (unsat)")
 
     print("\n" + "=" * 80)
     print("[+] ADVERSARIAL MUTATION & INVARIANTS: 100% APROVADO!")

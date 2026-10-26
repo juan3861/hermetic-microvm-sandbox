@@ -1,0 +1,11 @@
+component_id,source_repository,canonical_url,extracted_gear,target_subsystem,gap_id,relevance_score,readiness_score,staging_decision,justification
+GEAR-01,aquasecurity/tracee,https://github.com/aquasecurity/tracee,Tracee Syscall Event Model & Ring-Buffer,security/behavioral_ebpf_monitor.py,GAP-1,96,92,STAGE_AND_INTEGRATE,Real-time eBPF event stream and behavioral anomaly detector without root daemon
+GEAR-02,sigstore/rekor,https://github.com/sigstore/rekor,Rekor HashedRekord v0.0.1 Entry Generator,security/provenance_attestor.py,GAP-2,97,92,STAGE_AND_INTEGRATE,Cryptographic transparency log inclusion promise and hash format for Sigstore bundles
+GEAR-03,Z3Prover/z3,https://github.com/Z3Prover/z3,Z3 SMT Checkpoint Reversibility Invariant,core/formal_invariants_prover.py,GAP-3,99,95,STAGE_AND_INTEGRATE,Formal first-order logic proof of memory state restore idempotency and non-entropy leakage
+GEAR-04,checkpoint-restore/criu,https://github.com/checkpoint-restore/criu,In-RAM Time-Travel Memory Snapshot Model,core/time_travel_engine.py,GAP-1,90,80,STAGE_RESERVE,Memory page dirty bit tracking model for fine-grained rollbacks
+GEAR-05,stripe/smokescreen,https://github.com/stripe/smokescreen,CONNECT Proxy SSRF Filter,security/network_egress_guard.py,FOUNDATION,95,90,EXISTING_ALIGNED,Already integrated in network_egress_guard
+GEAR-06,containers/bubblewrap,https://github.com/containers/bubblewrap,Mount Table Cloaking & Namespaces,engines/local_core.py,FOUNDATION,98,95,EXISTING_ALIGNED,Core foundation of volatile RAM execution
+GEAR-07,sigstore/cosign,https://github.com/sigstore/cosign,DSSE PAE ECDSA P-256 Signing,security/provenance_attestor.py,GAP-2,98,95,EXISTING_ALIGNED,Completed in previous release
+GEAR-08,princeton-nlp/tree-of-thought-llm,https://github.com/princeton-nlp/tree-of-thought-llm,Tree-of-Thought Search Model,core/branch_manager.py,FOUNDATION,94,88,EXISTING_ALIGNED,Completed in v2.5.0
+GEAR-09,e2b-dev/E2B,https://github.com/e2b-dev/E2B,Drop-in Sandbox Python SDK Interface,sdk/hermetic_sandbox.py,FOUNDATION,96,90,EXISTING_ALIGNED,Completed in v2.4.0
+GEAR-10,cilium/tetragon,https://github.com/cilium/tetragon,Security Observability and Runtime Enforcement,security/behavioral_ebpf_monitor.py,GAP-1,93,85,STAGE_RESERVE,Policy-based syscall enforcement model

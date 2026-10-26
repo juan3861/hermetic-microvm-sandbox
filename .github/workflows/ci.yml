@@ -55,8 +55,9 @@ jobs:
         python orchestrator.py mesh --action status
         python orchestrator.py branch
         python orchestrator.py attest
+        python orchestrator.py ebpf
 
-    - name: Execute Full 26 Master Test Suites
+    - name: Execute Full 27 Master Test Suites
       run: |
         set -e
         for test_file in tests/test_*.py; do

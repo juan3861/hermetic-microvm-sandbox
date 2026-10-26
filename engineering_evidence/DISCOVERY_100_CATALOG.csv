@@ -1,0 +1,101 @@
+rank,repository_name,canonical_url,primary_language,category,license,relevance_score,readiness_score,status,addressed_gap,confidence
+1,firecracker-microvm/firecracker,https://github.com/firecracker-microvm/firecracker,Rust,MicroVM/Isolation,Apache-2.0,95,85,ACTIVE,FOUNDATION,HIGH
+2,cloud-hypervisor/cloud-hypervisor,https://github.com/cloud-hypervisor/cloud-hypervisor,Rust,MicroVM/Isolation,Apache-2.0,90,80,ACTIVE,FOUNDATION,HIGH
+3,google/gvisor,https://github.com/google/gvisor,Go,MicroVM/Isolation,Apache-2.0,96,88,ACTIVE,FOUNDATION,HIGH
+4,containers/bubblewrap,https://github.com/containers/bubblewrap,C,MicroVM/Isolation,LGPL-2.0,98,95,ACTIVE,FOUNDATION,HIGH
+5,containers/crun,https://github.com/containers/crun,C,MicroVM/Isolation,GPL-2.0,88,85,ACTIVE,FOUNDATION,HIGH
+6,opencontainers/runc,https://github.com/opencontainers/runc,Go,MicroVM/Isolation,Apache-2.0,85,85,ACTIVE,FOUNDATION,HIGH
+7,kata-containers/kata-containers,https://github.com/kata-containers/kata-containers,Rust,MicroVM/Isolation,Apache-2.0,89,78,ACTIVE,FOUNDATION,HIGH
+8,landlock-lsm/linux,https://github.com/landlock-lsm/linux,C,MicroVM/Isolation,GPL-2.0,94,90,ACTIVE,FOUNDATION,HIGH
+9,seccomp/libseccomp,https://github.com/seccomp/libseccomp,C,MicroVM/Isolation,LGPL-2.1,95,92,ACTIVE,FOUNDATION,HIGH
+10,checkpoint-restore/criu,https://github.com/checkpoint-restore/criu,C,MicroVM/Isolation,GPL-2.0,90,80,ACTIVE,GAP-1,HIGH
+11,systemd/systemd,https://github.com/systemd/systemd,C,MicroVM/Isolation,LGPL-2.1,75,70,ACTIVE,FOUNDATION,HIGH
+12,canonical/lxd,https://github.com/canonical/lxd,Go,MicroVM/Isolation,AGPL-3.0,78,65,ACTIVE,FOUNDATION,HIGH
+13,lxc/lxc,https://github.com/lxc/lxc,C,MicroVM/Isolation,LGPL-2.1,82,75,ACTIVE,FOUNDATION,HIGH
+14,rootless-containers/usernetes,https://github.com/rootless-containers/usernetes,Shell,MicroVM/Isolation,Apache-2.0,80,72,ACTIVE,FOUNDATION,MEDIUM
+15,openwrt/openwrt,https://github.com/openwrt/openwrt,C,MicroVM/Isolation,GPL-2.0,70,60,ACTIVE,FOUNDATION,MEDIUM
+16,netns/iproute2,https://github.com/shemminger/iproute2,C,MicroVM/Isolation,GPL-2.0,80,75,ACTIVE,FOUNDATION,HIGH
+17,coreos/container-linux-config-transpiler,https://github.com/coreos/container-linux-config-transpiler,Go,MicroVM/Isolation,Apache-2.0,65,60,ARCHIVED,FOUNDATION,MEDIUM
+18,shadow-maint/shadow,https://github.com/shadow-maint/shadow,C,MicroVM/Isolation,BSD-3-Clause,75,75,ACTIVE,FOUNDATION,HIGH
+19,containernetworking/plugins,https://github.com/containernetworking/plugins,Go,MicroVM/Isolation,Apache-2.0,82,80,ACTIVE,FOUNDATION,HIGH
+20,containerd/containerd,https://github.com/containerd/containerd,Go,MicroVM/Isolation,Apache-2.0,88,82,ACTIVE,FOUNDATION,HIGH
+21,bytecodealliance/wasmtime,https://github.com/bytecodealliance/wasmtime,Rust,Wasm Sandbox,Apache-2.0,92,88,ACTIVE,FOUNDATION,HIGH
+22,wasmerio/wasmer,https://github.com/wasmerio/wasmer,Rust,Wasm Sandbox,MIT,88,85,ACTIVE,FOUNDATION,HIGH
+23,bytecodealliance/wamr,https://github.com/bytecodealliance/wasm-micro-runtime,C,Wasm Sandbox,Apache-2.0,86,80,ACTIVE,FOUNDATION,HIGH
+24,tetratelabs/wazero,https://github.com/tetratelabs/wazero,Go,Wasm Sandbox,Apache-2.0,85,82,ACTIVE,FOUNDATION,HIGH
+25,containerd/runwasi,https://github.com/containerd/runwasi,Rust,Wasm Sandbox,Apache-2.0,84,78,ACTIVE,FOUNDATION,HIGH
+26,extism/extism,https://github.com/extism/extism,Rust,Wasm Sandbox,BSD-3-Clause,82,76,ACTIVE,FOUNDATION,MEDIUM
+27,second-state/WasmEdge,https://github.com/WasmEdge/WasmEdge,C++,Wasm Sandbox,Apache-2.0,85,80,ACTIVE,FOUNDATION,HIGH
+28,bytecodealliance/lucet,https://github.com/bytecodealliance/lucet,Rust,Wasm Sandbox,Apache-2.0,70,50,ARCHIVED,FOUNDATION,LOW
+29,appcypher/wasi-kernel,https://github.com/appcypher/wasi-kernel,Rust,Wasm Sandbox,MIT,76,65,ACTIVE,FOUNDATION,MEDIUM
+30,WebAssembly/spec,https://github.com/WebAssembly/spec,OCaml,Wasm Sandbox,Apache-2.0,75,70,ACTIVE,FOUNDATION,HIGH
+31,e2b-dev/E2B,https://github.com/e2b-dev/E2B,TypeScript,Agent Sandbox,Apache-2.0,96,90,ACTIVE,FOUNDATION,HIGH
+32,modal-labs/modal-client,https://github.com/modal-labs/modal-client,Python,Agent Sandbox,Apache-2.0,90,85,ACTIVE,FOUNDATION,HIGH
+33,daytonaio/daytona,https://github.com/daytonaio/daytona,Go,Agent Sandbox,Apache-2.0,92,85,ACTIVE,FOUNDATION,HIGH
+34,All-Hands-AI/OpenHands,https://github.com/All-Hands-AI/OpenHands,Python,Agent Sandbox,MIT,93,86,ACTIVE,FOUNDATION,HIGH
+35,princeton-nlp/SWE-bench,https://github.com/princeton-nlp/SWE-bench,Python,Agent Sandbox,MIT,90,88,ACTIVE,FOUNDATION,HIGH
+36,Significant-Gravitas/AutoGPT,https://github.com/Significant-Gravitas/AutoGPT,Python,Agent Sandbox,MIT,86,80,ACTIVE,FOUNDATION,HIGH
+37,geekan/MetaGPT,https://github.com/geekan/MetaGPT,Python,Agent Sandbox,MIT,84,78,ACTIVE,FOUNDATION,HIGH
+38,open-interpreter/open-interpreter,https://github.com/open-interpreter/open-interpreter,Python,Agent Sandbox,AGPL-3.0,88,80,ACTIVE,FOUNDATION,HIGH
+39,langchain-ai/langchain,https://github.com/langchain-ai/langchain,Python,Agent Sandbox,MIT,78,80,ACTIVE,FOUNDATION,HIGH
+40,microsoft/autogen,https://github.com/microsoft/autogen,Python,Agent Sandbox,CC-BY-4.0,86,82,ACTIVE,FOUNDATION,HIGH
+41,BerriAI/litellm,https://github.com/BerriAI/litellm,Python,Agent Sandbox,MIT,80,85,ACTIVE,FOUNDATION,HIGH
+42,run-llama/llama_index,https://github.com/run-llama/llama_index,Python,Agent Sandbox,MIT,79,80,ACTIVE,FOUNDATION,HIGH
+43,flyteorg/flyte,https://github.com/flyteorg/flyte,Go,Agent Sandbox,Apache-2.0,82,75,ACTIVE,FOUNDATION,HIGH
+44,paul-gauthier/aider,https://github.com/paul-gauthier/aider,Python,Agent Sandbox,Apache-2.0,89,88,ACTIVE,FOUNDATION,HIGH
+45,brexhq/prompt-engineering,https://github.com/brexhq/prompt-engineering,Markdown,Agent Sandbox,MIT,70,70,ACTIVE,FOUNDATION,MEDIUM
+46,aquasecurity/tracee,https://github.com/aquasecurity/tracee,Go,eBPF Observability,Apache-2.0,96,92,ACTIVE,GAP-1,HIGH
+47,iovisor/bcc,https://github.com/iovisor/bcc,C,eBPF Observability,Apache-2.0,95,90,ACTIVE,GAP-1,HIGH
+48,iovisor/bpftrace,https://github.com/iovisor/bpftrace,C++,eBPF Observability,Apache-2.0,92,88,ACTIVE,GAP-1,HIGH
+49,cilium/ebpf,https://github.com/cilium/ebpf,Go,eBPF Observability,MIT,94,90,ACTIVE,GAP-1,HIGH
+50,cilium/tetragon,https://github.com/cilium/tetragon,Go,eBPF Observability,Apache-2.0,93,85,ACTIVE,GAP-1,HIGH
+51,falcosecurity/falco,https://github.com/falcosecurity/falco,C++,eBPF Observability,Apache-2.0,90,84,ACTIVE,GAP-1,HIGH
+52,parca-dev/parca,https://github.com/parca-dev/parca,Go,eBPF Observability,Apache-2.0,84,80,ACTIVE,GAP-1,MEDIUM
+53,libbpf/libbpf,https://github.com/libbpf/libbpf,C,eBPF Observability,LGPL-2.1,95,90,ACTIVE,GAP-1,HIGH
+54,libbpf/libbpf-bootstrap,https://github.com/libbpf/libbpf-bootstrap,C,eBPF Observability,BSD-2-Clause,88,85,ACTIVE,GAP-1,HIGH
+55,eunomia-bpf/eunomia-bpf,https://github.com/eunomia-bpf/eunomia-bpf,C,eBPF Observability,MIT,85,80,ACTIVE,GAP-1,MEDIUM
+56,foniod/foniod,https://github.com/foniod/foniod,C++,eBPF Observability,Apache-2.0,80,70,ACTIVE,GAP-1,MEDIUM
+57,facebookincubator/katran,https://github.com/facebookincubator/katran,C++,eBPF Observability,GPL-2.0,82,75,ACTIVE,GAP-1,MEDIUM
+58,cloudflare/ebpf,https://github.com/cloudflare/ebpf,Go,eBPF Observability,MIT,86,82,ARCHIVED,GAP-1,MEDIUM
+59,pixie-io/pixie,https://github.com/pixie-io/pixie,C++,eBPF Observability,Apache-2.0,85,78,ACTIVE,GAP-1,HIGH
+60,aquasecurity/trivy,https://github.com/aquasecurity/trivy,Go,eBPF Observability,Apache-2.0,84,85,ACTIVE,GAP-1,HIGH
+61,sigstore/cosign,https://github.com/sigstore/cosign,Go,Supply Chain Security,Apache-2.0,98,95,ACTIVE,GAP-2,HIGH
+62,sigstore/rekor,https://github.com/sigstore/rekor,Go,Supply Chain Security,Apache-2.0,97,92,ACTIVE,GAP-2,HIGH
+63,sigstore/fulcio,https://github.com/sigstore/fulcio,Go,Supply Chain Security,Apache-2.0,92,85,ACTIVE,GAP-2,HIGH
+64,in-toto/in-toto,https://github.com/in-toto/in-toto,Python,Supply Chain Security,Apache-2.0,96,92,ACTIVE,GAP-2,HIGH
+65,in-toto/in-toto-golang,https://github.com/in-toto/in-toto-golang,Go,Supply Chain Security,Apache-2.0,93,88,ACTIVE,GAP-2,HIGH
+66,slsa-framework/slsa-verifier,https://github.com/slsa-framework/slsa-verifier,Go,Supply Chain Security,Apache-2.0,95,90,ACTIVE,GAP-2,HIGH
+67,theupdateframework/python-tuf,https://github.com/theupdateframework/python-tuf,Python,Supply Chain Security,Apache-2.0,88,86,ACTIVE,GAP-2,HIGH
+68,secure-systems-lab/dsse,https://github.com/secure-systems-lab/dsse,Python,Supply Chain Security,Apache-2.0,95,92,ACTIVE,GAP-2,HIGH
+69,open-policy-agent/opa,https://github.com/open-policy-agent/opa,Go,Supply Chain Security,Apache-2.0,89,88,ACTIVE,GAP-2,HIGH
+70,spiffe/spire,https://github.com/spiffe/spire,Go,Supply Chain Security,Apache-2.0,87,80,ACTIVE,GAP-2,HIGH
+71,openfga/openfga,https://github.com/openfga/openfga,Go,Supply Chain Security,Apache-2.0,85,82,ACTIVE,GAP-2,HIGH
+72,anchore/syft,https://github.com/anchore/syft,Go,Supply Chain Security,Apache-2.0,86,88,ACTIVE,GAP-2,HIGH
+73,anchore/grype,https://github.com/anchore/grype,Go,Supply Chain Security,Apache-2.0,85,86,ACTIVE,GAP-2,HIGH
+74,CycloneDX/cyclonedx-python,https://github.com/CycloneDX/cyclonedx-python,Python,Supply Chain Security,Apache-2.0,84,85,ACTIVE,GAP-2,HIGH
+75,google/trillian,https://github.com/google/trillian,Go,Supply Chain Security,Apache-2.0,89,80,ACTIVE,GAP-2,HIGH
+76,Z3Prover/z3,https://github.com/Z3Prover/z3,C++,Formal Verification,MIT,99,95,ACTIVE,GAP-3,HIGH
+77,cvc5/cvc5,https://github.com/cvc5/cvc5,C++,Formal Verification,GPL-3.0,92,85,ACTIVE,GAP-3,HIGH
+78,model-checking/smt-switch,https://github.com/model-checking/smt-switch,C++,Formal Verification,BSD-3-Clause,88,80,ACTIVE,GAP-3,MEDIUM
+79,model-checking/kani,https://github.com/model-checking/kani,Rust,Formal Verification,Apache-2.0,90,82,ACTIVE,GAP-3,HIGH
+80,verus-lang/verus,https://github.com/verus-lang/verus,Rust,Formal Verification,Apache-2.0,89,78,ACTIVE,GAP-3,HIGH
+81,dafny-lang/dafny,https://github.com/dafny-lang/dafny,C#,Formal Verification,MIT,84,75,ACTIVE,GAP-3,HIGH
+82,leanprover/lean4,https://github.com/leanprover/lean4,C++,Formal Verification,Apache-2.0,85,75,ACTIVE,GAP-3,HIGH
+83,coq/coq,https://github.com/coq/coq,OCaml,Formal Verification,LGPL-2.1,82,70,ACTIVE,GAP-3,HIGH
+84,agda/agda,https://github.com/agda/agda,Haskell,Formal Verification,MIT,80,68,ACTIVE,GAP-3,MEDIUM
+85,SRI-CSL/yices2,https://github.com/SRI-CSL/yices2,C,Formal Verification,GPL-3.0,85,80,ACTIVE,GAP-3,HIGH
+86,princeton-nlp/tree-of-thought-llm,https://github.com/princeton-nlp/tree-of-thought-llm,Python,Memory/Tree Search,MIT,94,88,ACTIVE,FOUNDATION,HIGH
+87,kyegomez/Tree-of-Thoughts,https://github.com/kyegomez/Tree-of-Thoughts,Python,Memory/Tree Search,MIT,88,82,ACTIVE,FOUNDATION,HIGH
+88,dimatura/userfaultfd-sys,https://github.com/dimatura/userfaultfd-sys,Rust,Memory/Tree Search,MIT,86,78,ACTIVE,GAP-1,MEDIUM
+89,checkpoint-restore/criu-image-streamer,https://github.com/checkpoint-restore/criu-image-streamer,Python,Memory/Tree Search,GPL-2.0,82,75,ACTIVE,GAP-1,MEDIUM
+90,google/madvise,https://github.com/google/madvise,C,Memory/Tree Search,Apache-2.0,80,75,ARCHIVED,FOUNDATION,LOW
+91,facebook/zstd,https://github.com/facebook/zstd,C,Memory/Tree Search,BSD-3-Clause,90,92,ACTIVE,FOUNDATION,HIGH
+92,torvalds/linux,https://github.com/torvalds/linux,C,Memory/Tree Search,GPL-2.0,88,85,ACTIVE,FOUNDATION,HIGH
+93,dropbox/fast_diff,https://github.com/dropbox/fast_diff,Python,Memory/Tree Search,Apache-2.0,82,80,ARCHIVED,FOUNDATION,MEDIUM
+94,stripe/smokescreen,https://github.com/stripe/smokescreen,Go,Network Egress & Secrets,Apache-2.0,95,90,ACTIVE,FOUNDATION,HIGH
+95,trufflesecurity/trufflehog,https://github.com/trufflesecurity/trufflehog,Go,Network Egress & Secrets,AGPL-3.0,94,90,ACTIVE,FOUNDATION,HIGH
+96,gitleaks/gitleaks,https://github.com/gitleaks/gitleaks,Go,Network Egress & Secrets,MIT,92,88,ACTIVE,FOUNDATION,HIGH
+97,Yelp/detect-secrets,https://github.com/Yelp/detect-secrets,Python,Network Egress & Secrets,Apache-2.0,90,85,ACTIVE,FOUNDATION,HIGH
+98,envoyproxy/envoy,https://github.com/envoyproxy/envoy,C++,Network Egress & Secrets,Apache-2.0,88,80,ACTIVE,FOUNDATION,HIGH
+99,projectdiscovery/httpx,https://github.com/projectdiscovery/httpx,Go,Network Egress & Secrets,MIT,85,82,ACTIVE,FOUNDATION,HIGH
+100,awslabs/aws-sdk-js-codemod,https://github.com/awslabs/aws-sdk-js-codemod,TypeScript,Network Egress & Secrets,Apache-2.0,75,72,ACTIVE,FOUNDATION,MEDIUM

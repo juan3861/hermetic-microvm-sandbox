@@ -29,6 +29,7 @@ from core.pty_manager import SandboxPTYManager, PTYSession
 from core.replay_recorder import ReplayRecorder, ReplayEngine
 from core.branch_manager import BranchManager, MemoryBranchDiff
 from security.provenance_attestor import ProvenanceAttestor, ExecutionProvenanceReceipt
+from security.behavioral_ebpf_monitor import BehavioralEBPFMonitor
 
 ExecutionResult = REPLExecutionResult
 
@@ -140,16 +141,26 @@ class SandboxFiles:
 class SandboxCommands:
     """Command execution conduit using Silicon Native C launcher and Bubblewrap isolation."""
 
-    def __init__(self, session_id: str, ram_path: str, recorder: Optional[ReplayRecorder] = None):
+    def __init__(
+        self,
+        session_id: str,
+        ram_path: str,
+        recorder: Optional[ReplayRecorder] = None,
+        ebpf_monitor: Optional[BehavioralEBPFMonitor] = None
+    ):
         self.session_id = session_id
         self.ram_path = ram_path
         self.recorder = recorder
+        self.ebpf_monitor = ebpf_monitor
         self.silicon = SiliconBridge()
         self.sanitizer = SecretSanitizer()
 
     def run(self, cmd: str, env: Optional[Dict[str, str]] = None, timeout: int = 45) -> CommandResult:
         """Executes a command inside the session's DDR RAM sandbox with active secret redaction."""
         t0 = time.perf_counter()
+        if self.ebpf_monitor:
+            self.ebpf_monitor.record_trace_event("BPF_PROBE_EXEC", pid=os.getpid(), target=cmd, action="execve")
+
         wrapped_cmd = f"cd '{self.ram_path}' && {cmd}"
         exec_res = self.silicon.dispatch_sandboxed_payload("sh", ["-c", wrapped_cmd])
         elapsed = round((time.perf_counter() - t0) * 1000, 3)
@@ -217,8 +228,14 @@ class Sandbox:
         )
 
         self.recorder = ReplayRecorder(session_id=self.id)
+        self.ebpf_monitor = BehavioralEBPFMonitor()
         self.files = SandboxFiles(session_id=self.id, ram_path=self.ram_path, recorder=self.recorder)
-        self.commands = SandboxCommands(session_id=self.id, ram_path=self.ram_path, recorder=self.recorder)
+        self.commands = SandboxCommands(
+            session_id=self.id,
+            ram_path=self.ram_path,
+            recorder=self.recorder,
+            ebpf_monitor=self.ebpf_monitor
+        )
         self.process = SandboxProcessManager(commands=self.commands)
         self.repl = StatefulREPLEngine(session_id=self.id, ram_workspace=self.ram_path)
         self.pty = SandboxPTYManager(session_id=self.id, ram_workspace=self.ram_path)
@@ -348,6 +365,10 @@ class Sandbox:
     ) -> bool:
         """Verifies the authenticity and cryptographic signature of a provenance receipt."""
         return self.provenance_attestor.verify_attestation(receipt, public_key_pem=public_key_pem)
+
+    def get_ebpf_telemetry(self) -> Dict[str, Any]:
+        """Returns the real-time behavioral eBPF security telemetry stream from RAM."""
+        return self.ebpf_monitor.analyze_event_stream()
 
     def close(self) -> None:
         """Evaporates the sandbox and all RAM allocations instantly."""
